@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Java编程思想 | 在路上</title>
+  <meta name="description" content="除了情怀，还有诗和远方" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="在路上">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(//blog.ghost.org/content/images/2013/Nov/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="//blog.ghost.org/content/images/2013/Nov/bloglogo_1-1.png" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">在路上</h1>
+            <h2 class="blog-description">除了情怀，还有诗和远方</h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2016-05-23T10:10:26.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+    
+    | 
+    <a href='/tags/Java/'>Java</a>
+    
+    
+</span>
+    <h1 class="post-title">Java编程思想</h1>
+    <section class="post-content">
+      <h1 id="1-对象导论"><a href="#1-对象导论" class="headerlink" title="1.对象导论"></a>1.对象导论</h1><h4 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h4><p>在继承关系中，我们习惯称子类为导出类，它所继承的父类为基类。</p>
+<ul>
+<li>向上转型：<strong>向继承结构的上层转型为一个更泛化的类型</strong>，将导出类看做是其基类的过程，这种转型是安全的。</li>
+<li>多态：在程序运行时，调用父类方法中所抽象的接口，Java会自动寻找到所对应的子类的实现方法。正是因为Java的特殊设计方式，多态使得事情变得简单。但由于多态的固有特性，在程序运行时，你需要知道怎样去通过其来设计，即使程序设计用到了向上转型，该对象也需要知道要执行怎样的正确行为。</li>
+</ul>
+<h4 id="绑定"><a href="#绑定" class="headerlink" title="绑定"></a>绑定</h4><ul>
+<li>前期绑定：编译器产生一个具体的函数名称调用，在程序运行时将此调用解析到将要被执行的代码的<strong>绝对地址</strong>。但在OOP中，程序在运行的时候才能够知道代码的绝对地址，所以必须采用其他的机制。</li>
+<li>后期绑定：编译器首先要确保被调用的方法存在，并<strong>对调用参数和返回值执行类型检查</strong>——无法提供此类保障的语言称为<em>弱类型</em>的，并不知道将要被执行的确切的代码。</li>
+</ul>
+<p><em>注：在某些语言中，必须声明某些方法具备后期绑定的属性才能够使用（e.g.C++中使用virtual来声明）。在Java中，<strong>动态绑定是默认的行为</strong>，不需添加声明关键字。</em></p>
+<h4 id="单继承结构"><a href="#单继承结构" class="headerlink" title="单继承结构"></a>单继承结构</h4><p>在OOP中，需要解决一个很重要的问题，<em>是否所有的类都继承于同一个基类？</em>在Java语言中中的确是这样，这个终极基类就是<strong>Object</strong>——单继承结构带来了很多好处。</p>
+<ul>
+<li>所有的对象都有一个共同的接口，归根到底他们都是相同的基本类。</li>
+<li>保证所有的对象都具备某些功能。</li>
+<li>为<strong>垃圾回收机制</strong>提供了便利。</li>
+</ul>
+<h4 id="容器（panel）"><a href="#容器（panel）" class="headerlink" title="容器（panel）"></a>容器（panel）</h4><p>概念：在任何需要时可以对其内容进行扩充，不需要知道到底需要多少对象多少方法，创建一个容器（也称为集合，即Collections类）方法来处理所有细节。</p>
+<p>对于具体容器的选择：</p>
+<ul>
+<li>不同容器提供了不同类型的接口与外部行为，堆栈与队列就是这样。</li>
+<li>不同容器对于某些操作具有不同的效率，e.g. <strong>ArrayList与LinkedList</strong>，在ArrayList中，随机访问元素花费的时间是固定的，但在LinkedList中，访问的元素花费的时间与其靠近表尾的距离成反比（越靠近表尾花费时间越长）；但对LinkedList来说，在其列表中插入一个元素，它的开销比ArrayList的要小。</li>
+</ul>
+<h4 id="参数化类型"><a href="#参数化类型" class="headerlink" title="参数化类型"></a>参数化类型</h4><p>向下转型：向上转型的逆过程，这中转型方式较为危险，当不是确切的知道所要处理的具体对象类型，这种方式几乎是不安全的。但当从容器中取出对象的引用时，必须以某种方式记住这些对象是什么类型，这样才能够正确的执行向下转型。</p>
+<p>Java SE5的重大变化之一就是增加了<strong>参数化类型</strong>，在Java中称之为范型。</p>
+<p>一对尖括号，中间包含类型信息。例如，</p>
+<blockquote>
+<p>ArrayList&lt; Shape &gt; shapes = new ArrayList&lt; Shape &gt;();</p>
+</blockquote>
+<h4 id="对象的创建与其生命周期"><a href="#对象的创建与其生命周期" class="headerlink" title="对象的创建与其生命周期"></a>对象的创建与其生命周期</h4><p>对象的创建：</p>
+<ul>
+<li>将对象置于堆栈（有时被称为自动变量（automatic variable）或是限域变量（scoped variable））或静态储存区域来实现。这种方式必须在编写程序的时候明确知道对象的确切数量、生命周期和类型，对于更为一般的问题来讲，这种方法就显得无能为力了。</li>
+<li>在堆（heap）的内存池中动态地创建对象。在这种方式中，直到运行时才知道需要多少对象，生命周期是什么样，它们具有什么样的类型。动态方式有一个一般性的逻辑假设：<em>对象趋向于变得复杂，所以查找和释放储存空间的开销不会对对象的创建造成重大的冲击</em>。这种动态方式带来的<strong>灵活性</strong>正是解决<strong>一般性</strong>问题所需要的。</li>
+</ul>
+<p>Java完全采用动态分配内存的方式，用new关键字来创建新的对象。</p>
+<p>对象的生命周期：</p>
+<ul>
+<li>在堆栈上创建对象的语言，编译器可以确定对象存在的时间，并可以自动销毁它。</li>
+<li>在堆上创建对象，编译器对其生命周期一无所知（e.g. 在C++语言中，必须通过编程方式来确定何时销毁对象）</li>
+</ul>
+<p>Java采用<strong>“垃圾回收机制”</strong>，它可以用来处理内存释放问题（不包括清理对象的其他方面）。这一点同单根继承结构一起使得Java编程比C++编程要容易得多。</p>
+<h4 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h4><p>异常处理将错误直接置于编程语言中，<strong>异常是一种对象</strong>，它从出错的地点被”抛出”，由专门被设计用来处理特定类型错误的异常处理器来”捕获”。异常处理与程序正常执行是并行的关系，不会干扰到程序的正常执行。<strong><em>异常提供了一种从错误状况进行可靠恢复的途径</em></strong>。</p>
+<p>异常处理早在面向对象语言出现之前就已经存在，它不算是一个面向对象语言的特征。</p>
+<h4 id="并发编程"><a href="#并发编程" class="headerlink" title="并发编程"></a>并发编程</h4><p>并发：对于大量的问题，我们需要将其分解成许多个可独立运行的部分（任务），即就是在同一时刻处理多个任务的思想，从而提高程序的响应能力。这些彼此可独立运行的部分称为线程。</p>
+<p>并发虽然会提高程序的响应，但会带来一个隐患：共享资源。若有多个并行的任务同时访问同一个资源，就会出现问题。例如，两个进程不能同时向一台打印机发送消息。为了解决这个问题，必须在某个任务访问资源时锁定该资源，完成任务后再释放资源锁（同步块），使其他任务可以使用这个资源。</p>
+<h1 id="2-一切都是对象"><a href="#2-一切都是对象" class="headerlink" title="2.一切都是对象"></a>2.一切都是对象</h1><h4 id="用引用操纵对象"><a href="#用引用操纵对象" class="headerlink" title="用引用操纵对象"></a>用引用操纵对象</h4><hr>
+<p>一切事物都可以看做对象，但操纵的标识符可以看成是对象的一个”引用”。例如，对象是电视，引用是遥控器，只要<strong>建立起遥控器与电视之间的连接</strong>，就可以用遥控器操纵电视。除此之外，即使没有电视机，遥控器也可以存在。即就是你有一个引用，并不一定需要有一个对象与之关联。</p>
+<p>e.g. 如果想操纵一个句子，可以创建一个String引用：</p>
+<blockquote>
+<p>String s;</p>
+</blockquote>
+<p>但这里只是有引用并没有对象，若向s发送一个消息，就会返回一个运行时错误。这是因为s还没有与任何事物相关联。</p>
+<p>利用Java语言的特性：字符串可以用带引号的文本初始化，来创建一个引用：</p>
+<blockquote>
+<p>String s = “abcd”;</p>
+</blockquote>
+<p>不过，通常使用new操作符来实现一个新的引用与一个新的对象相关联：</p>
+<blockquote>
+<p>String s = new String(“abcd”);</p>
+</blockquote>
+<h4 id="程序运行时对象存储到什么地方"><a href="#程序运行时对象存储到什么地方" class="headerlink" title="程序运行时对象存储到什么地方"></a>程序运行时对象存储到什么地方</h4><hr>
+<ul>
+<li>寄存器：最快的储存区，位于处理器内部，数量极其有限，需要根据需求分配。你不能直接控制，在程序中也不能有寄存器存在的迹象。</li>
+<li>堆栈：位于通用RAM（随机访问存储器）中，通过<strong>堆栈指针</strong>来分配内存：<strong>堆栈指针向下移动，分配新的内存；向上移动则释放这些内存</strong>。速度仅次于寄存器。Java的对象引用存储于堆栈中，但Java对象并不存储在其中。</li>
+<li>堆：通用的内存池（位于RAM区），用于<strong>存放所有的Java对象</strong>。堆不同于堆栈的好处：需要一个对象，运用关键字new即可生成，当执行这段代码时，会<strong>自动在堆中进行存储分配</strong>。代价就是堆分配内存比堆栈需要更多的时间。</li>
+<li>常量存储：常量值通常会直接放在代码内部，有时可以将其存放在ROM（只读存储器）中。</li>
+<li><p>非RAM存储：如果数据完全存活于程序之外，完全不受程序的控制，即使在程序不运行的时候也可以存在。典型的例子就是流对象与持久化对象：</p>
+<pre><code>1. 流对象：对象转化成字节流，通常被发送给另一台机器。
+2. 持久化对象：对象被存放于磁盘上，所以即使程序终止它仍可以保持自己的状态。（将对象转化成可以存放在其他媒介上的事物，在需要时可恢复成之前的样子）
+</code></pre></li>
+</ul>
+<h4 id="基本类型"><a href="#基本类型" class="headerlink" title="基本类型"></a>基本类型</h4><hr>
+<table>
+<thead>
+<tr>
+<th>基本类型</th>
+<th>包装器类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boolean</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td>char</td>
+<td>Character</td>
+</tr>
+<tr>
+<td>byte</td>
+<td>Byte</td>
+</tr>
+<tr>
+<td>short</td>
+<td>Short</td>
+</tr>
+<tr>
+<td>int</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td>long</td>
+<td>Long</td>
+</tr>
+<tr>
+<td>float</td>
+<td>Float</td>
+</tr>
+<tr>
+<td>double</td>
+<td>Double</td>
+</tr>
+<tr>
+<td>void</td>
+<td>Void</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>BigInteger：支持任意精度的整数，在运算中可以准确的表示任何大小的整数值。</li>
+<li>BigDecimal：任何精度的定点数，可用来做精确的货币运算。</li>
+</ul>
+<h4 id="基本成员的默认值"><a href="#基本成员的默认值" class="headerlink" title="基本成员的默认值"></a>基本成员的默认值</h4><hr>
+<table>
+<thead>
+<tr>
+<th>基本类型</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boolean</td>
+<td>false</td>
+</tr>
+<tr>
+<td>char</td>
+<td>‘\u00000’(null)</td>
+</tr>
+<tr>
+<td>byte</td>
+<td>byte(0)</td>
+</tr>
+<tr>
+<td>short</td>
+<td>(short)0</td>
+</tr>
+<tr>
+<td>int</td>
+<td>0</td>
+</tr>
+<tr>
+<td>long</td>
+<td>0L</td>
+</tr>
+<tr>
+<td>float</td>
+<td>0.0f</td>
+</tr>
+<tr>
+<td>double</td>
+<td>0.0d</td>
+</tr>
+</tbody>
+</table>
+<h4 id="static关键字"><a href="#static关键字" class="headerlink" title="static关键字"></a>static关键字</h4><p>声明一个事物是static时，就意味着：1、只为某特定域分配单一存储空间；2、希望某个方法不会与包含它的那个类的任何对象实例关联在一起。</p>
+<pre><code>class StaticTest{
+static int i = 66;
+}
+
+StaticTest st1 = new StaticTest();
+StaticTest st2 = new StaticTest();
+</code></pre><p>如上，st1.i与st2.i指向同一存储空间，具有相同的值。</p>
+<h1 id="3-操作符"><a href="#3-操作符" class="headerlink" title="3.操作符"></a>3.操作符</h1><h4 id="赋值"><a href="#赋值" class="headerlink" title="赋值"></a>赋值</h4><hr>
+<p>对一个对象赋值时，实际是将”引用”从一个地方复制到另一个地方。所以如果对象使用c=d，那么c、d将会指向原本d指向的那个对象。</p>
+<pre><code>class Tank{
+int level;
+}
+main(){
+Tank t1 = new Tank();
+Tank t2 = new Tank();
+t1.level = 11;
+t2.level = 22;//out.println();
+t1 = t2;//out.println();
+t1.level = 33;//out.println();
+}/*output:
+t1.level = 11, t2.level=22;
+t1.level = 22, t2.level=22;    赋值后指向同一引用
+t1.level = 33, t2.level=33;    改变引用指向的对象的值，使得两个实例对象都改变
+*/
+</code></pre><p>上述种现象称为”别名现象”，为了避免这种问题，可以这样写：</p>
+<pre><code>t1.level = t2.level;
+</code></pre><h4 id="算术操作符"><a href="#算术操作符" class="headerlink" title="算术操作符"></a>算术操作符</h4><hr>
+<p>强调一下Random类，通常在创建Random对象时提供种子（用于随机数生产器的初始化，随机数生成器对于特定的种子值总是产生相同的随机数序列）。如果不提供种子，Java就会将当前时间作为生成器的种子。</p>
+<h4 id="关系操作符"><a href="#关系操作符" class="headerlink" title="关系操作符"></a>关系操作符</h4><hr>
+<pre><code>n1 == n2;
+</code></pre><p>比较的是两个对象的引用，并不是对象的内容。</p>
+<p>为了比较对象的内容可以使用equals()方法，但需要注意在没有重写equals()方法的时候，它默认的行为是比较引用，不过大多数Java类都实现了equals()方法。</p>
+<h4 id="逻辑操作符"><a href="#逻辑操作符" class="headerlink" title="逻辑操作符"></a>逻辑操作符</h4><hr>
+<ul>
+<li>短路：如果一个表达示中不需要执行完毕就可以知道结果，那么就不必计算下去，Java会直接给出结果。如果这些逻辑表达式都存在一部分不必计算，那么将获得潜在性能的提升。</li>
+</ul>
+<h4 id="字符串操作符"><a href="#字符串操作符" class="headerlink" title="字符串操作符"></a>字符串操作符</h4><hr>
+<pre><code>int x = 0, y = 1, z = 2;
+String s = &quot;x, y, z&quot;;
+print(s + x+ y+ z);//1⃣️输出为：x, y, z012
+print(s + (x + y + z));//2⃣️输出为：x, y,z3
+</code></pre><p>为什么在1⃣️中输出不是xyz三者之和？因为Java会自动先将xyz转换为所对应的字符串；<br>而在2⃣️中，由于有括号的优先权，输出就是我们想要的3。</p>
+<h4 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h4><hr>
+<ol>
+<li><p>扩展转换与窄化转换：</p>
+<ul>
+<li>窄化转换，将容纳更多信息的数据类型转换成无法容纳那么多信息的数据类型，这面临着数据丢失的危险，如果非要这么做，就必须进行显示的类型转换（强制转换）；</li>
+<li>扩展转换，不必进行显示的类型转换，因为新类型肯定能够容纳原来类型的信息。</li>
+<li>Java允许将任何基本数据类型转换成别的基本数据类型，但<strong>布尔类型除外</strong>。</li>
+<li>“类”数据类型不允许进行类型转换（对象可以在其所属类型的类族之间相互转换），为了将一种类转换成另一种，必须采用特殊方法。</li>
+</ul>
+</li>
+<li><p>截尾与舍入</p>
+<ul>
+<li>截尾：在执行窄化转换时，总是对数字进行截尾操作。</li>
+<li>舍入：使用java.lang.Math.round()可以进行四舍五入操作。</li>
+</ul>
+</li>
+<li><p>提升</p>
+<ul>
+<li>在一个表达式中，最大的数据类型决定了表达式最终结果的数据类型。</li>
+</ul>
+</li>
+</ol>
+<h1 id="4-控制执行流程"><a href="#4-控制执行流程" class="headerlink" title="4.控制执行流程"></a>4.控制执行流程</h1><h4 id="迭代"><a href="#迭代" class="headerlink" title="迭代"></a>迭代</h4><p>迭代语句：while, do-while, for.</p>
+<pre><code>for(初始化 ; 布尔表达式; 步进){}
+
+逗号操作符：for(int i = 1, j = i +10; i &lt; 5; i++, j = i* 2){}
+
+foreach: 
+for(元素类型: 数组){}//用于数组和容器，输出序列中的每一项
+</code></pre><h1 id="5-初始化与清理"><a href="#5-初始化与清理" class="headerlink" title="5.初始化与清理"></a>5.初始化与清理</h1><h4 id="用构造器初始化"><a href="#用构造器初始化" class="headerlink" title="用构造器初始化"></a>用构造器初始化</h4><hr>
+<p>构造器（constructor）：在创建对象时自动调用的方法。</p>
+<p>假想为编写的每个类都定义一个initialize()方法，在Java中，通过提供构造器，在用户创建对象后，当在用户有能力调用对象之前自动调用构造器，从而完成初始化。</p>
+<p>问题是：一、所取的任何名字都可能与其他类的某个成员名称所冲突；二、调用构造器是编译器的责任，必须让编译器知道应该具体调用哪个方法。</p>
+<p>最终Java沿用了在C++中的方法，<strong>构造器采用与类相同的名称</strong>，通常在一个类中构造器也称之为构造方法。</p>
+<h4 id="方法的重载"><a href="#方法的重载" class="headerlink" title="方法的重载"></a>方法的重载</h4><hr>
+<p>方法重载：让方法名相同而形式参数不同的构造器同时存在。</p>
+<p>区分重载方法：每一个重载的方法都有一个独立一二的参数类型列表。（参数类型的差异，参数顺序的不同得以区分，不过一般不建议使用参数顺序不同，这样会使得代码难以维护）</p>
+<h4 id="this关键字"><a href="#this关键字" class="headerlink" title="this关键字"></a>this关键字</h4><hr>
+<p>this关键字只能在方法内部使用，表示对”调用方法的那个对象”的引用。在方法中调用同一个类中的另一个方法时，不需要加上this，直接使用即可。</p>
+<h4 id="在构造器中调用构造器"><a href="#在构造器中调用构造器" class="headerlink" title="#在构造器中调用构造器"></a>#在构造器中调用构造器</h4><p>构造器方法可以在内部，通过形如this(参数)来调用类中重载的构造器方法。但要记住，构造器方法只允许在构造器方法内调用，其他方法内调用会报错。</p>
+<h4 id="static方法"><a href="#static方法" class="headerlink" title="static方法"></a>static方法</h4><hr>
+<p>在static方法内部不能调用非静态方法，反之却可以。<strong>可以在没有创建任何对象的前提下，仅通过类本身来调用static方法</strong>，这是它的主要用途。</p>
+<h4 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h4><hr>
+<p>垃圾回收器只知道释放那些经由new分配的内存，然而假定有对象并非使用new产生，它获得了一块”特殊”的区域。由于这样，Java允许在类中定义一个名为<strong>finalize()</strong>的方法：一旦垃圾回收器准备好释放对象占用的存储空间，首先调用其<strong>finalize()</strong>方法，在下一次垃圾回收动作时，回收对象占用的内存。</p>
+<ol>
+<li>对象可能不被垃圾回收。</li>
+<li>垃圾回收并不等于”析构”（C++中的析构函数，销毁对象必须使用这个函数）。</li>
+<li>垃圾回收只与内存有关。</li>
+</ol>
+<p>finalize()的使用限制：通过某种创建对象方式以外的方式为对象分配了存储空间。</p>
+<h4 id="垃圾回收工作原理"><a href="#垃圾回收工作原理" class="headerlink" title="#垃圾回收工作原理"></a>#垃圾回收工作原理</h4><p>Java虚拟机通常采用一种<strong>自适应</strong>的方式来回收垃圾：</p>
+<ul>
+<li>停止－复制：先暂停程序的运行，之后将所有存活的对象从当前堆复制到另一个堆中，而剩下没有被复制的对象都是垃圾。对象被复制到新堆时，是紧密排列的，即是连续的空间，不必重新整理这些对象。但这样效率会很低，而且需要很大的空间来存放这些新对象，较为浪费。</li>
+<li>标记－清扫：从堆栈和静态存储区出发，遍历所有的引用，找出所有存活的对象，并依次设置标记。清理动作在完成全部标记后开始，剩下没有被标记的对象将被释放。但剩下的堆空间是不连续的，要想得到连续空间，需要重新整理剩下的对象。</li>
+</ul>
+<p>在程序运行时，Java虚拟机会进行监视，当所有对象都很稳定，且垃圾回收效率很低的话，就切换到”标记－清扫”方式；Java会根据”标记－清扫”的效果来判断，若堆出现了很多碎片，就切换到”停止－复制”方式。这就是Java自适应的基本原理。</p>
+<h4 id="成员初始化"><a href="#成员初始化" class="headerlink" title="成员初始化"></a>成员初始化</h4><hr>
+<p>在方法内部的局部变量，若编译之前程序员没有为其赋值，编译器就会报错。Java认为采用默认值反而会掩盖这种错误，所以会强制程序员提供一个初始值，这样往往能帮助找出程序里的缺陷。——不过，如果类的数据成员是基本类型，在初始化时都会保证其都有一个初始值。</p>
+<h4 id="构造器初始化"><a href="#构造器初始化" class="headerlink" title="构造器初始化"></a>构造器初始化</h4><hr>
+<p>在类的内部，先初始化成员变量（<strong>定义的先后顺序决定了初始化的顺序，避免因为顺序定义而产生的错误</strong>）—&gt;之后初始化构造器方法—&gt;最后初始化main函数所调用的方法</p>
+<h4 id="静态数据的初始化"><a href="#静态数据的初始化" class="headerlink" title="#静态数据的初始化"></a>#静态数据的初始化</h4><p>初始化顺序是，先初始化静态对象，后初始化”非静态”对象。而静态初始化动作仅执行一次：当首次生成这个类的一个对象时，或者首次访问属于那个类的静态数据成员时（从未生成过那个类的对象）。</p>
+<h4 id="枚举类型"><a href="#枚举类型" class="headerlink" title="枚举类型"></a>枚举类型</h4><hr>
+<p>使用enum，需要创建一个该类型的引用，并将其赋值给某个实例。编译器会自动创建toString()方法，从而便于显示某个enum实例名字；编译器还会创建<strong>ordinal()</strong>方法，表示某个特定enum常量的<strong>声明顺序</strong>；静态的<strong>values()</strong>方法，会按照声明顺序来产生<strong>名字数组</strong>。</p>
+<p>此外，enum最常出现的地方就是与switch搭配使用，可以通过enum集合来直观看出程序的意欲是什么。</p>
+<h1 id="6-访问权限控制"><a href="#6-访问权限控制" class="headerlink" title="6.访问权限控制"></a>6.访问权限控制</h1><p>由于一些消费者（客户端程序员）需要在代码的某些方面保持不变，这对于类库的设计者来说尤其重要。所以就产生了一个基本问题：<strong>如何将变动的事物与保持不变的事物区分开来？</strong></p>
+<p>基于以上问题，Java中产生了访问权限的控制机制。访问权限的控制等级，由大到小依次是：public、protected、包访问权限（无关键词）、private。</p>
+<h4 id="包、库单元"><a href="#包、库单元" class="headerlink" title="包、库单元"></a>包、库单元</h4><hr>
+<p>在编写一个Java源代码文件（通常称为编译单元）中，每个编译单元只能有一个public类，其他的非public类主要用来为主public类提供支持。</p>
+<p>当编译一个.java文件时，.java文件中的每一个类都会产生一个输出文件，且其后缀名为.class。因此，编译少量的.java文件将会产生大量的.class文件。<strong>Java可运行程序是一组可以打包并压缩为一个Java文档文件（JAR，使用Java的jar文档生成器）的.class文件</strong>。</p>
+<ul>
+<li>包访问权限：默认访问权限没有任何关键字，当前包中的所有其他类对那个成员都有访问权限，但对于这个包之外的所有类，是private的。所以，同一个编译单元中的所有类彼此之间都是自动可访问的。</li>
+<li>public（接口访问权限）：类声明成public即表示自己对每个人都是可用的。</li>
+<li>private（无法访问）：除了包含该成员的类之外，其他任何类都无法访问这个成员。</li>
+<li>protected（继承访问权限）：所继承的派生类（而不是所有类）拥有对基类的访问权限。</li>
+</ul>
+<h4 id="接口和实现"><a href="#接口和实现" class="headerlink" title="接口和实现"></a>接口和实现</h4><hr>
+<p>访问权限的控制被称为是<strong>具体实现的隐藏</strong>。把数据和方法包装进类中，以及具体实现的隐藏，常共同被称作是<strong>封装</strong>。</p>
+<h4 id="类的访问权限"><a href="#类的访问权限" class="headerlink" title="类的访问权限"></a>类的访问权限</h4><hr>
+<p>类既不可以是private的（会使得该类之外的其他任何类都无法访问它），也不可以是protected的。对于类的访问权限，只有两种：包访问权限和public。如果不希望其他任何人对该类拥有访问权限，可以把所有构造器方法的权限设置成private，但你可以通过该类的static成员内部创建该类的对象。</p>
+<pre><code>class Soup1{
+    private Soup1(){}
+    public static Soup1 makeSoup(){
+    return new Soup1;//其他类可以通过调用makeSoup方法来新建Soup1对象
+    }
+}
+</code></pre><h1 id="7-复用类"><a href="#7-复用类" class="headerlink" title="7.复用类"></a>7.复用类</h1><h4 id="初始化基类"><a href="#初始化基类" class="headerlink" title="初始化基类"></a>初始化基类</h4><hr>
+<p>导出类继承于基类，<strong>当创建了一个导出类对象时，该对象就包含了一个基类子对象</strong>，这个子对象与用基类直接创建的对象是一样的，不同点在于后者来自于外部，而<strong>基类的子对象被包装在导出类对象内部</strong>。</p>
+<p>构建构造器的过程是从”基类”向外扩散的，所以基类在导出类构造器可以访问它之前，就已经完成了初始化。</p>
+<p><em>没有默认的基类构造器，需要创建一个带有参数的基类构造器，必须用关键字super显示地编写调用基类构造器的语句</em>。</p>
+<h4 id="确保正确清理"><a href="#确保正确清理" class="headerlink" title="确保正确清理"></a>确保正确清理</h4><hr>
+<p>为了确保正确清理，使用try和finally关键字，其中被try的括号括起来的范围是所谓的<em>保护区</em>，需要被特殊处理。而finally子句中的代码无论发生什么，<strong>总是要被执行的。</strong></p>
+<p>在清理方法中，必须注意对基类清理方法super.dispose()和成员对象清理方法的调用顺序：执行类所有特定的清理动作，其<strong>顺序同生成顺序相反（通常所要求的基类元素仍旧存活）</strong>，之后再调用基类的清理方法。</p>
+<h4 id="名称屏蔽"><a href="#名称屏蔽" class="headerlink" title="名称屏蔽"></a>名称屏蔽</h4><hr>
+<p>若Java的基类拥有多个已被多次重载的方法名称，那么在导出类中重新定义该方法名称时并不会屏蔽其在基类中的任何版本（即导出类可以直接调用在基类重载的方法）。</p>
+<p>JavaSE5中新添加了注解@Override（覆写），当你不留心重载而不是覆写了该方法时，编译器会提示你。</p>
+<h4 id="final关键字"><a href="#final关键字" class="headerlink" title="final关键字"></a>final关键字</h4><hr>
+<p>final字面意思为不可修改的。</p>
+<ol>
+<li>final数据</li>
+</ol>
+<p>一个既是static又是final的域只占据一段不能改变的存储空间。<strong>对于基本类型，final使数值恒定不变；对于对象引用，final使引用恒定不变</strong>。</p>
+<p>空白final：指被声明为final但未给定初值的域。无论什么情况下，编译器都确保空白final在使用前必须被初始化。</p>
+<p>final参数：Java允许在参数列表中以声明的方式将参数指明为final，意味着你无法在方法中更改引用所指向的对象；若是基本类型，你只可以读取参数，而不可以更改它。</p>
+<ol>
+<li>final方法</li>
+</ol>
+<p>为什么使用final方法？</p>
+<ul>
+<li>为了把方法锁定，防止任何继承类修改它的含义，确保在继承中使方法行为保持不变，并且不会被覆盖。</li>
+<li>为了效率。</li>
+</ul>
+<p>关于final和private：在导出类中如果你试图去覆盖一个private方法，似乎是奏效的。但实际上是，你并没有覆盖该方法，只是生成了一个新的方法（只不过名字相同）。</p>
+<ol>
+<li>final类：当将某个类的整体定义为final时，表明其他任何类都不能继承该类（final类禁止继承），该类不希望存在子类。</li>
+</ol>
+<h1 id="8-多态"><a href="#8-多态" class="headerlink" title="8.多态"></a>8.多态</h1><p>面向对象的程序设计三种基本特征：数据抽象，继承，多态。</p>
+<p>多态通过分离做什么与怎么做，从另一方面将接口与实现分离开来。多态可明显改善代码的组织结构和可读性，还能够创建<strong>可拓展程序</strong>。</p>
+<p>当一个方法的参数是由与基类同名的一个引用构成，它既可以接受基类的引用又可以接受任何导出类的引用。但是，当引用是导出类时，该方法是怎么准确定位到所要传入的导出类引用的？这就是绑定：</p>
+<h4 id="绑定-1"><a href="#绑定-1" class="headerlink" title="绑定"></a>绑定</h4><hr>
+<p>绑定：将一个方法调用同一个方法主体关联起来被称作绑定。<br>前期绑定：在程序执行前进行绑定（由编译器和连接程序实现）。<br>后期绑定（也叫动态绑定或运行时绑定）：在运行时根据对象的类型进行绑定。</p>
+<p>当导出类对象转型为基类对象时，任何域访问操作都将由编译器解析，因此不是多态的。如果某个方法是静态的，它的行为就不具有多态性。</p>
+<h4 id="构造器与多态"><a href="#构造器与多态" class="headerlink" title="构造器与多态"></a>构造器与多态</h4><p>一个复杂对象调用构造器要遵循下面的顺序：</p>
+<ol>
+<li>在其他任何事物发生之前，将分配给对象的存储空间初始化为二进制的零。</li>
+<li>调用基类构造器：我们必须确保所要使用的成员都已经构建完毕，所以必须首先调用基类构造器。</li>
+<li>按照声明顺序调用成员的初始化方法。</li>
+<li>调用导出类构造器的主体。</li>
+</ol>
+<p>若遵循以上规则，就能保证所有基类成员以及当前对象的成员对象都已得到初始化。</p>
+<h4 id="纯继承与向下转型"><a href="#纯继承与向下转型" class="headerlink" title="纯继承与向下转型"></a>纯继承与向下转型</h4><p>众所周知，向上转型是安全的，但是它会丢失具体的类型信息，如果导出类在基类所拥有的方法上，创造了一些新方法，在使用向上转型的时候，就不能调用这些新方法。</p>
+<p>至此，我们想到了利用向下转型。但对于向下转型，我们无法知道是否是安全的。所以，必须有某种方法来确保向下转型的正确性。</p>
+<p>在Java中，所有转型都会得到检查。所以我们即使使用了”(“, “)”式的强制转换，如果发生错误，就会抛出”ClassCastException”（类型转换异常）。这种在运行期间对类型进行检查的行为叫做”运行时类型识别”（RTTI，Runtime type information）。</p>
+<h1 id="9-接口"><a href="#9-接口" class="headerlink" title="9.接口"></a>9.接口</h1><p>接口和内部类为我们提供了一种将接口与实现分离的更加结构化的方法。</p>
+<h4 id="抽象类与抽象方法"><a href="#抽象类与抽象方法" class="headerlink" title="抽象类与抽象方法"></a>抽象类与抽象方法</h4><hr>
+<p>抽象基类，简称为抽象类，是包含抽象方法的类，如果一个类包含一个或多个抽象方法，该类必须被限定为抽象的。创建抽象类是希望通过这个通用接口操纵一系列类。</p>
+<pre><code>abstract void 方法名();
+abstract class 类名称{}
+</code></pre><p>如果从一个抽象类继承，必须为基类中所有的抽象方法提供方法的定义。抽象类是很有用的重构工具，它使得我们很容易地<strong>将公共方法沿着继承层次结构向上移动</strong>。</p>
+<h4 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h4><hr>
+<p>使用<strong>interface</strong>关键字，接口是更为抽象的概念。它产生一个完全抽象的类，根本没有任何具体实现。允许创建者确定方法名，参数列表和返回类型，没有任何方法体（即花括号）。接口这有形式，没有任何具体的实现。</p>
+<p>要让一个类遵循某个特定接口（或者是一组接口），需要使用<strong>implements</strong>关键字，表示声明具体实现细节。</p>
+<p>在导出类中，可以继承任意多的接口，用逗号隔开，并可以向上转型为每个接口，每个接口都是独立类型。在组合接口时，尽量避免使用相同的方法名，这样会造成代码可读性的混乱（InterfaceCollision）。</p>
+<p>放入接口中的任何域都是static和final的，接口中定义的域不能是空final的，但可以被非常量表达式初始化。这些定义的域不是接口的一部分，它们的值被存储在接口的静态存储区域内。</p>
+<p>工厂模式：单独定义一个方法用来产生所需要的实例（return new 类型名），这样做的好处是将创建实例与初始化实例两者分开，减少彼此之间的耦合性，从而利于代码的扩展与维护。</p>
+<h1 id="10-内部类"><a href="#10-内部类" class="headerlink" title="10.内部类"></a>10.内部类</h1><p>内部类：将一个类的定义放在另一个类的定义内部。</p>
+<p>需要从外部类的非静态方法之外的任意位置创建某个内部类对象，必须具体的指明这个对象的类型：OuterClassName.InnerClassName。</p>
+<p>内部类拥有外围类的所有元素的访问权。</p>
+<h4 id="使用-this和-new"><a href="#使用-this和-new" class="headerlink" title="使用.this和.new"></a>使用.this和.new</h4><p>若需要生成对外部类对象的引用，可以使用外部类名字后加<strong>.this</strong>。</p>
+<p>在创建某个内部类对象之前，必须在new表达式中提供对其他外部类对象的引用，可以使用<strong>.new</strong>。</p>
+<h4 id="匿名内部类"><a href="#匿名内部类" class="headerlink" title="匿名内部类"></a>匿名内部类</h4><p>创建一个继承自基类的匿名类的对象，通过new表达式返回的引用被自动向上转型为对基类的引用。匿名内部类后面的分号是表达式的结束。</p>
+<p>如果想为匿名内部类创造一个构造器的效果，可以这样：</p>
+<pre><code>abstract class Base{
+    public Base(int i){
+        print(&quot;Base constructor, i = &quot; + i);
+    }
+    public abstract void f();
+}
+
+public class AnonymousConstructor{
+    public static Base getBase(int i){
+        return new Base(i){
+            {print(&quot;Inside instance initializer&quot;);}
+            public void f(){
+                print(&quot;In anonymous f()&quot;);
+            }
+        };
+    public static void main(String[] args){
+        Base base = getBase(47);
+        base.f();
+    }
+}
+
+上述例子中，不要求i一定是final的，因为i被传递给匿名类的基类构造器，它不会在匿名类内部被直接使用。
+</code></pre><h4 id="嵌套类"><a href="#嵌套类" class="headerlink" title="嵌套类"></a>嵌套类</h4><ul>
+<li>要创建嵌套类的对象，并不需要其外围类的对象。</li>
+<li>不能从嵌套类的对象中访问非静态的外围类对象。</li>
+</ul>
+<h4 id="接口内部的类"><a href="#接口内部的类" class="headerlink" title="接口内部的类"></a>接口内部的类</h4><p>放置在接口中的任何类都是static和public的，正常情况下，不能在接口内部放置任何代码，但嵌套类可以做为接口的一部分。</p>
+<h4 id="内部类与控制框架（control-framework）"><a href="#内部类与控制框架（control-framework）" class="headerlink" title="内部类与控制框架（control framework）"></a>内部类与控制框架（control framework）</h4><p>应用程序框架（application framework）是被设计用来解决某类特定问题的一个类或一组类。而设计模式总是将变化的事物与保持不变的事物分离开，在这个模式中，模版方法是保持不变的事物，而可覆盖的方法就是变化的事物。</p>
+<p>控制框架是一类特殊的应用程序框架，<strong>它用来解决响应事件的需求</strong>。主要用来响应事件的系统称为<strong>事件驱动系统</strong>。e.g. Java Swing库就是一个控制框架，它解决了大量GUI问题，并在其中大量使用内部类。</p>
+<p>在控制框架中，内部类允许：</p>
+<ul>
+<li>控制框架的完整实现是由单个的类创建的，从而使得实现的细节被封装了起来。</li>
+<li>内部类能够访问外围类的任意成员，使得这种实现变的优雅。</li>
+</ul>
+<h4 id="局部内部类与匿名内部类比较"><a href="#局部内部类与匿名内部类比较" class="headerlink" title="局部内部类与匿名内部类比较"></a>局部内部类与匿名内部类比较</h4><p>局部内部类可以有已命名的构造器，而匿名内部类不能使用构造器，只可以有实例初始化。</p>
+<p>使用局部内部类而不使用匿名内部类的原因是：需要一个已命名的构造器，或者需要重载构造器，需要不止一个的内部类对象。</p>
+<h4 id="内部类标识符"><a href="#内部类标识符" class="headerlink" title="内部类标识符"></a>内部类标识符</h4><p>外围类的名字＋”＄”＋内部类名字:</p>
+<pre><code>LocalInnerClass$LocalCounter.class
+</code></pre><p>如果内部类是匿名的，编译器会简单的产生一个数字作为其标识符：</p>
+<pre><code>LocalInnerClass$1.class
+</code></pre><h1 id="11-持有对象"><a href="#11-持有对象" class="headerlink" title="11.持有对象"></a>11.持有对象</h1><p>如果一个类没有显式的声明继承自哪个类，那么它自动地继承自Object。例如，在ArrayList中，没有定义泛型的情况下，保存的是Object，当在使用get()方法取出认为是Apple对象时，你实际得到的是Object引用，必须将其转型为 Apple。</p>
+<p>通过应用预定义的泛型，可以防止在编译期将错误类型对象放置到容器中。例如，要想定义用来保存Apple对象的ArrayList，你可以声明ArrayList&lt; Apple &gt;。其中尖括号括起来的是类型参数（可以有多个），它指定了这个容器可以保存的类型。另外，<strong>向上转型可以将其他导出类型一样作用于泛型</strong>。</p>
+<h4 id="List"><a href="#List" class="headerlink" title="List"></a>List</h4><p>List以特定的顺序保存一组元素，在Collection基础上添加了大量方法，使得可以在List的中间插入和移除元素。</p>
+<p>常用的两种类型List：</p>
+<ul>
+<li>ArrayList：长用于随机访问元素，但在List中间插入和移除元素时较慢。</li>
+<li>LinkedList：通过代价较低的在List中间进行的插入移除操作，提供了优化的顺序访问。LinkedList在随机访问相对来说比较慢。</li>
+</ul>
+<h4 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h4><p>迭代器是一个对象，能够遍历并选择序列中的对象，将遍历序列的操作与序列底层的结构分离，所以客户端程序员不必知道底层的结构。</p>
+<p>迭代器能够让你使用通用的代码，让你只是使用容器，不需要关心容器的类型。迭代器是一种轻量级的对象，创建它的代价很小。所以在Java中对迭代器有许多限制，这个Iterator只能单向移动，并且：</p>
+<ul>
+<li>使用方法iterator()要求返回一个Iterator。Iterator将准备好返回序列的第一个元素。</li>
+<li>使用next()获得序列中的下一个元素。</li>
+<li>使用hasNext()检查序列是否还有元素。</li>
+<li>使用remove()移除有next()产生的最后一个元素（在调用remove()之前必须先调用next()）。</li>
+</ul>
+<p><strong><em>迭代器统一了对容器的访问方式</em></strong></p>
+<h4 id="ListIterator"><a href="#ListIterator" class="headerlink" title="#ListIterator"></a>#ListIterator</h4><p>ListIterator是一个强大的Iterator的子类型：</p>
+<ol>
+<li>只能用于各种List类的访问，ListIterator可以<strong>双向移动</strong>。</li>
+<li>产生迭代器在列表中当前位置的前后索引。</li>
+<li>使用set()替换访问过的最后一个元素。</li>
+<li>使用listIterator()方法产生一个指向List开始处的ListIterator或使用带形式参数的listIterator(n)产生一个指向索引n元素处的ListIterator。</li>
+</ol>
+<h4 id="Stack"><a href="#Stack" class="headerlink" title="Stack"></a>Stack</h4><p>栈是一种先进后出的容器，也被称为叠加栈，最后”压入”栈的元素，第一个”弹出”栈。可以将LinkedList作为栈使用。</p>
+<h4 id="Set"><a href="#Set" class="headerlink" title="Set"></a>Set</h4><p>Set不保存重复的元素，最常被使用的是测试归属性（基于对象的值来确定），你可以很容易地询问到某个对象是否在某个Set中。为了进行快速查找，通常使用HashSet（使用散列函数达到快速查找的目的）来实现。</p>
+<pre><code>//该方法能将一个字符串以空格的形式断开，分离成许多小段
+    &quot;A B C D E F G H&quot;.split(&quot; &quot;)
+</code></pre><h4 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h4><p>Map类是将对象映射到其他对象的类型。Map是一种由许多键值对（key-value）构成的类型，它甚至可以从一维拓展到多维，假如你需要跟踪一个拥有多个宠物的人，如下：</p>
+<pre><code>Map&lt;Person, List&lt;Pet&gt;&gt;
+</code></pre><p>其中Map.keySet()方法返回的是所有键set的组合。</p>
+<h4 id="Queue"><a href="#Queue" class="headerlink" title="Queue"></a>Queue</h4><p>队列是一个典型的先进先出容器，即事物放入容器的顺序与取出的顺序是相同的。队列常当作一种可靠的将对象从程序的某个区域传输到另一个区域的途径，尤其是在并发编程中很重要。</p>
+<h4 id="PriorityQueue"><a href="#PriorityQueue" class="headerlink" title="#PriorityQueue"></a>#PriorityQueue</h4><p>优先级队列声明下一个弹出元素是最需要的元素（具有最高的优先级）。调用offer()方法，会在队列中插入一个对象，该对象会被排序，一般的默认排序将使用对象在队列中的自然顺序。但可以通过使用Comparator来修改这个顺序，并且PriorityQueue确保你调用peek()，poll()，remove(）方法时，最先获取到的是优先级最高的元素。</p>
+<p>其中，最小的值拥有最高的优先级（如果是String，空格的优先级比字母高）</p>
+<h4 id="Collection和Iterator"><a href="#Collection和Iterator" class="headerlink" title="Collection和Iterator"></a>Collection和Iterator</h4><p>Collection是描述所有容器共性的<strong>根接口</strong>，但在Java中，用迭代器而不是Collection表示容器的共性似乎更为明智。将两者绑定在一起，实现Collection就意味着需要提供iterator()方法。所以在有Collection作为外部类时，比用Iterator更为方便，还可以使用foreach结。</p>
+<p>但当没有Collection作为外部类时，用Iterator就变得更为有优势了。</p>
+<h4 id="适配器方法的惯用法"><a href="#适配器方法的惯用法" class="headerlink" title="适配器方法的惯用法"></a>适配器方法的惯用法</h4><p>“适配器”来自于设计模式，必须提供特定接口以满足foreach语句。例如，希望在默认的向前迭代器基础上，添加产生反向迭代器的能力，所以不能使用覆盖，而是添加一个Iterable对象方法。</p>
+<p>注意：在使用Collection.shuffle()方法时，要意识到Arrays.asList()产生的List对象会使用底层数组作为其物理实现，如果直接初始化给list，并调用shuffle()方法，将会影响到原来的数组。好的做法是利用该shuffle()方法打乱引用，所以初始化的时候可以使用new ArrayList&lt;&gt;(Arrays.asList(..))将其包装起来，达到赋给实例的只是它的引用的目的。</p>
+<h1 id="12-通过异常处理错误"><a href="#12-通过异常处理错误" class="headerlink" title="12.通过异常处理错误"></a>12.通过异常处理错误</h1><p>发现错误的理想时机是在编译阶段，即在运行程序之前。改进错误恢复机制是提供代码健壮性的最强有力的方式。Java使用”异常”来提供一个错误报告模型，从而使得构件能够与客户端代码可靠的沟通。</p>
+<h4 id="构造器"><a href="#构造器" class="headerlink" title="构造器"></a>构造器</h4><p>比如你打开一个文件，这种动作只有在对象使用完毕并且用户调用了特殊的清理方法后才能清理。在这个时候，构造器中如果发生了异常，清理对象的工作可能会不能正常执行。<strong>所以编写构造器要十分注意</strong>。</p>
+<p>finally或许可以解决这个问题，但当构造器在执行过程中发生了异常，可能该对象的某些部分还没有被创建，而这些部分是在finally中要被清理的。</p>
+<h4 id="异常匹配"><a href="#异常匹配" class="headerlink" title="异常匹配"></a>异常匹配</h4><p>派生类的对象可以匹配其基类的处理程序，例如，catch(Exception e)会捕获Exception以及所有从它派生的异常。</p>
+<h1 id="13-字符串"><a href="#13-字符串" class="headerlink" title="13.字符串"></a>13.字符串</h1><h4 id="不可变String"><a href="#不可变String" class="headerlink" title="不可变String"></a>不可变String</h4><p>每当把String作为参数传给方法时，都会复制一份引用（传递的一份引用的拷贝），而该引用所指的对象一直待在单一的物理位置上从未改变。</p>
+<p>对于一个方法而言，<strong>参数是为方法提供信息的</strong>，并不希望方法来改变自己本身。</p>
+<h4 id="String与StringBuilder"><a href="#String与StringBuilder" class="headerlink" title="String与StringBuilder"></a>String与StringBuilder</h4><p>如果直接为String赋值，编译器在运行时会使用StringBuilder.toString()方法来做性能的优化，但是若你想在循环中赋值，不建议这样做，因为每一次的循环都会创建一个新的StringBuilder对象，Java最后的垃圾回收效率降低，程序的性能会下降。</p>
+<p>好的方法是，你自己创建一个StringBuilder对象，使用它来构造结果，这样在循环中不会每一次循环都创建一个新的StringBuidler对象。如果你预先知道所需的字符串大概占用多少资源，你可以事先为其指定大小，这样做可以避免多次重新分配缓冲。</p>
+<h4 id="String上的操作"><a href="#String上的操作" class="headerlink" title="String上的操作"></a>String上的操作</h4><p>当需要改变字符内容时，String类的方法都会返回一个新的String对象；若内容没有发生改变，String的方法只返回指向原对象的引用。</p>
+<h4 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h4><p>要找一个数字，可能有一个符号在前面: </p>
+<pre><code>-?
+</code></pre><p>要描述一个或多个整数：</p>
+<pre><code>\\d+
+</code></pre><p>可能有一个负号，后面跟着一位或多位数字：</p>
+<pre><code>-?\\d+
+</code></pre><p>可能以一个加号或减号开头，后面有一位或多位数字：</p>
+<pre><code>(-|\\+)?\\d+    //在使用＋时需要将其转义
+</code></pre><p>String类自带的方法中有一个split()方法，可以将字符串从与正则表达式匹配的地方分开。</p>
+<pre><code>\\W+ //意思是一个或多个非单词字符（如果W小写，\w，则表示一个单词字符）
+</code></pre><h4 id="Pattern"><a href="#Pattern" class="headerlink" title="Pattern"></a>Pattern</h4><pre><code>Pattern.compile(&quot; &quot;).split(CharSequence input) //分割字符串
+Pattern.compile(&quot; &quot;).split(CharSequence input, int limit) //分割字符串，并且int可以限制分割后的字符串数量
+</code></pre><h4 id="替换操作"><a href="#替换操作" class="headerlink" title="替换操作"></a>替换操作</h4><pre><code>appendReplacement(StringBuffer sbuf, String replacement)    //执行渐近式替换，允许你调用其他方法来生成或处理replacement.
+appendTail(StringBuffer sbuf)    //在执行了一次或多次appendReplacement()之后，调用此方法可以将输入字符串剩下部分复制到sbuf中。
+</code></pre><h4 id="Scanner"><a href="#Scanner" class="headerlink" title="Scanner"></a>Scanner</h4><p>Scanner可以接受任何类型的输入对象（例如，File对象、InputStream对象、String对象、Readable对象）。Scanner根据空白字符对输入进行分词，使用useDelimiter()方法（e.g.useDelimiter(“\s<em>,\s</em>“)表示使用逗号及其前后任意的空白字符作为定界符）。</p>
+<h1 id="14-类型信息"><a href="#14-类型信息" class="headerlink" title="14.类型信息"></a>14.类型信息</h1><p>为了使用类做的准备工作包含：</p>
+<ol>
+<li>加载，由类加载器执行。查找字节码，并从这些字节码中创建一个Class对象。</li>
+<li>链接，验证类中的字节码，为静态域分配存储空间，必要的时候将解析这个类创建的对其他类的所有引用。</li>
+<li>初始化，该类如果具有超类，对其初始化，执行静态初始化器和静态初始化块。</li>
+</ol>
+<hr>
+<ul>
+<li><strong>仅使用.class语法来获得对类的引用不会引发初始化。</strong></li>
+<li>如果一个static final值是<strong>“编译期常量”</strong>，那么这个值不需要对类进行初始化就可以被读取。</li>
+<li>如果一个static域不是final的，在读取它的值之前，要先进行链接和初始化。</li>
+</ul>
+<h4 id="泛化的Class引用"><a href="#泛化的Class引用" class="headerlink" title="泛化的Class引用"></a>泛化的Class引用</h4><pre><code>Class&lt;?&gt; intClass = int.class;    //使用通配符，表示一个非具体的类引用
+Class&lt;? extends Number&gt; bounded = int.class;    //创建一个class引用被限定为某种类型或其子类型，我们需要使用extends，从而创建一个范围
+</code></pre><p>当你需要声明超类的引用时，若编译器不在编译期，它只允许你声明一个含糊的引用，例如”某个类，它是FancyToy超类”，如下，</p>
+<pre><code>Class&lt;? super FancyToy&gt; = f.getSuperclass();    
+//而newInstance方法返回的不是精确类型，只是Object
+Object obj = f.getSuperclass().newInstance();
+</code></pre><h4 id="静态测试对象方法instanceof与动态测试对象"><a href="#静态测试对象方法instanceof与动态测试对象" class="headerlink" title="静态测试对象方法instanceof与动态测试对象"></a>静态测试对象方法instanceof与动态测试对象</h4><p>通常，静态的instanceof语句常在if条件中出现，例如，</p>
+<pre><code>if(child instanceof father)    //语义是如果child是father的一个特定类型，那么
+...;
+</code></pre><p>动态的测试对象常用Class.isInstance，该方法避免了直接输入具体类的繁琐过程，从而使得代码变得简洁易懂</p>
+<h1 id="15-泛型"><a href="#15-泛型" class="headerlink" title="15.泛型"></a>15.泛型</h1><p>泛型实现了参数化类型，使代码可以应用于多种类型，从而可以编写更为通用的代码。</p>
+<h4 id="简单泛型"><a href="#简单泛型" class="headerlink" title="简单泛型"></a>简单泛型</h4><pre><code>public class Holder&lt;T&gt;{
+    ...
+
+    //定义时暂不指定类型，在创建实例时指定你想要创建的具体类型
+    Holder&lt;Automobile&gt; h = new Holder&lt;Automobile&gt;(new Automobile);
+}    
+</code></pre><h4 id="一个元组类库"><a href="#一个元组类库" class="headerlink" title="一个元组类库"></a>一个元组类库</h4><p>元组：将一组对象直接打包存储于其中的一个单一对象。元组可以有任意长度，元组中的对象可以是任意不同的类型。</p>
+<pre><code>public class Two&lt;A, B&gt;{
+    public final A first;    //注意final意味着你只可以读取对象而不能改变
+    public final B second;
+    public Two(A a, B b){    //元组隐含地保持了其中元素的次序
+        first = a;
+        second = b;
+    }
+}
+//增加类型参数
+public class Three&lt;A, B, C&gt; extends Two&lt;A, B&gt;{
+    public final C third;
+    public Three(A a, B b, C c){
+        super(a, b);
+        third = c;
+    }
+}
+...
+</code></pre><h4 id="堆栈类"><a href="#堆栈类" class="headerlink" title="堆栈类"></a>堆栈类</h4><p>通过实现自己的内部链式存储机制（每调用一次方法，就会创建一个对象链接到前一个对象），可以使用<strong>末端哨兵</strong>来判断堆栈何时为空。</p>
+<h4 id="泛型接口"><a href="#泛型接口" class="headerlink" title="泛型接口"></a>泛型接口</h4><p>泛型可以应用于接口，比如生成器（一种专门负责创建对象的类），这是工厂方法设计模式的一种。当使用生成器创建新对象时，不需要任何参数。</p>
+<p>Java泛型的局限性就是基本类型不能作为类型的参数，但Java SE5具备自动打包和拆包的功能。</p>
+<h4 id="泛型方法"><a href="#泛型方法" class="headerlink" title="泛型方法"></a>泛型方法</h4><p>泛型方法使得该方法能够独立于类而产生变化，定义泛型方法，需要将泛型参数列表置于返回值之前，比如：</p>
+<pre><code>public &lt;T&gt; void f(T x){...}
+</code></pre><h4 id="可变参数与泛型方法共存"><a href="#可变参数与泛型方法共存" class="headerlink" title="可变参数与泛型方法共存"></a>可变参数与泛型方法共存</h4><pre><code>public static &lt;T&gt; List&lt;T&gt; makeList(T... args){
+    List&lt;T&gt; result = new ArrayList&lt;T&gt;();
+    for(T item : args)
+        result.add(item);
+    return result;
+}
+</code></pre><h4 id="理解擦除"><a href="#理解擦除" class="headerlink" title="理解擦除"></a>理解擦除</h4><p><strong>在泛型代码内部，无法获得任何有关泛型参数类型的信息。</strong>也就是说当你使用泛型时，任何具体的类型信息都被擦除了，唯一知道的是你正在使用一个对象。所以，例如List<string>和List<integer>，这两种形式都被擦除成它们”原生”类型，List。</integer></string></p>
+<h4 id="边界"><a href="#边界" class="headerlink" title="边界"></a>边界</h4><p>边界可以在用于泛型的参数类型上设置限制条件，边界就是动作发生的地方。边界更重要的运用是你可以按照自己的边界类型来调用方法。</p>
+<p>Java泛型重用extends关键字，此处的extends关键字在泛型边界上下文环境中和在普通情况下所具有的意义是完全不同的。</p>
+<p>在使用extends时，类必须在前，然后接口在后，值得一提的是，在extends中，只能继承一个类，但是可以继承多个接口：</p>
+<pre><code>class haha&lt;T extends class1 &amp; interface1 &amp; interface2 &amp; ...&gt;{}
+</code></pre><h4 id="通配符"><a href="#通配符" class="headerlink" title="通配符"></a>通配符</h4><p>在泛型表达式中的问号称为通配符，它在使用extends时被限制为单一边界。</p>
+<h4 id="逆变"><a href="#逆变" class="headerlink" title="#逆变"></a>#逆变</h4><p>超类型通配符，声明通配符是由某个特定类的基类来界定的，方法如下，</p>
+<pre><code>&lt;? super Myclass&gt; //或&lt;? super T&gt;
+</code></pre><p>这样就可以安全的传递一个类型对象到泛型类型中了</p>
+<h4 id="无界通配符"><a href="#无界通配符" class="headerlink" title="#无界通配符"></a>#无界通配符</h4><p>方法形如&lt;?&gt;，声明用Java泛型来编写代码，不用原生类型，在这种情况下，泛型参数可以持有任何类型。</p>
+<p>但更重要的是，无界通配符可以为其他参数确定某种特定类型。</p>
+<p>List本质表示”持有任何Object类型的原生List”，而List&lt;?&gt;表示”具有某种特定类型的非原生List，只是我们不知道是什么”</p>
+<h4 id="捕获转换"><a href="#捕获转换" class="headerlink" title="#捕获转换"></a>#捕获转换</h4><p>如果向&lt;?&gt;方法中传递原生类型，编译器可能推断出实际的类型参数，使此方法回转并调用另一个使用这个确切类型的方法。但捕获转换非常受限，因为你需要在方法内部使用确切的类型。</p>
+<h4 id="自限定类型"><a href="#自限定类型" class="headerlink" title="自限定类型"></a>自限定类型</h4><p>自限定的类型像如下所示，</p>
+<pre><code>class SelfBounded&lt;T extends SelfBounded&lt;T&gt;&gt;{//SelfBounded类接受泛型参数T，而T由一个边界类来限定，这个边界类就是拥有T作为参数的SelfBounded（自限定基本模式）
+}
+</code></pre><p>它希望在继承关系中，像下面这样来使用这个类，</p>
+<pre><code>class A extends SelfBounded&lt;A&gt;{}
+</code></pre><p>这样做会<strong>强制要求将正在定义的类当作参数传递给基类</strong>。</p>
+<p>自限定类型可以<strong>保证类型参数与正在被定义的类相同</strong>。</p>
+<h4 id="动态类型安全"><a href="#动态类型安全" class="headerlink" title="动态类型安全"></a>动态类型安全</h4><p>我们知道，受检查的容器在你试图插入类型不正确的对象时会抛出ClassCastException，我们可以使用Collections中的一组便利工具来执行类型安全检查，有这几种静态方法：checkedCollection(), checkedList(), checkedMap(), checkedSet(), checkedSortedMap(), checkedSortedSet()。其中，第一个参数接受你希望动态检查的容器，第二个参数接受你希望强制要求的类型。</p>
+<h4 id="混型"><a href="#混型" class="headerlink" title="混型"></a>混型</h4><p>最基本的概念是混合多个类的能力，以产生一个可以表示混型中所有类型的类。常见的方法是使用接口来产生混型效果，但是当使用更为复杂的混型时，代码的数量将会急剧增加。</p>
+<h1 id="16-数组"><a href="#16-数组" class="headerlink" title="16.数组"></a>16.数组</h1><p>数组与其他种类的容器区别主要有三方面：</p>
+<ol>
+<li>效率、类型和保存基本类型的能力。数组是<strong>效率最高</strong>的存储和随机访问序列的方式，但是代价就是数组对象的<strong>大小被固定</strong>，且在生命周期内不可改变。</li>
+<li>数组和容器都可以保证不滥用他们。</li>
+<li>数组可以去持有某种具体的类型，意味着你可以通过编译期的检查来防止插入错误的信息类型。</li>
+<li>数组可以持有基本类型，而泛型之前的容器不能。</li>
+</ol>
+<h4 id="数组与泛型"><a href="#数组与泛型" class="headerlink" title="数组与泛型"></a>数组与泛型</h4><p>数组与泛型不能很好的结合，你不能实例化具有参数化类型的数组，原因是在泛型中擦除会移除掉参数类型信息，而数组必须知道它们所持有的确切类型。</p>
+<p>虽然编译器不允许实例化泛型数组，但它允许你创建对数组的引用，如下，</p>
+<pre><code>List&lt;String&gt;[] ls;
+</code></pre><h4 id="Arrays-fill"><a href="#Arrays-fill" class="headerlink" title="Arrays.fill()"></a>Arrays.fill()</h4><p>fill()方法只能用同一个值填充数组中的各个位置或是指定区域的某个位置。</p>
+<ol>
+<li><p>复制数组 System.arraycopy()</p>
+<p> System.arraycopy(源数组，源数组起始偏移量，目标数组，目标数组起始偏移量，复制的元素个数);</p>
+</li>
+<li><p>数组的比较 equals()</p>
+</li>
+</ol>
+<p>Arrays类提供了重载后的equals()方法，其中数组相等的条件是元素个数必须相等并且相对应索引的元素也应该相等，要清楚重载后的equals()方法比较的是内容而不是引用。</p>
+<ol>
+<li><p>数组的排序</p>
+<p> Arrays.sort(a);    //对数组依据字典编排顺序排序<br> Arrays.sort(a, Collections.reverseOrder());    //上述的逆序<br> Arrays.sort(a, String.CASE_INSENSITIVE_ORDER);    //1⃣️忽略大小写字母将其放在一起的排序</p>
+</li>
+<li><p>在已排序的数组中查找</p>
+<p> Arrays.binarySearch(数组, 目标元素);    //如果找到了目标，返回值等于或大于零</p>
+</li>
+</ol>
+<h1 id="17-容器深入研究"><a href="#17-容器深入研究" class="headerlink" title="17.容器深入研究"></a>17.容器深入研究</h1><h4 id="完整的容器分类法"><a href="#完整的容器分类法" class="headerlink" title="完整的容器分类法"></a>完整的容器分类法</h4><p>图：<img src="http://images.cnitblog.com/i/617995/201404/161352345105405.png" alt="完整的容器分类法"></p>
+<h4 id="填充容器"><a href="#填充容器" class="headerlink" title="填充容器"></a>填充容器</h4><pre><code>//两种方法中的所有引用都指向相同的对象
+Collections.nCopies();    //但nCopies()能添加新的对象
+Collections.fill();    //而fill()方法只能替换现有的元素
+</code></pre><h4 id="Set和存储顺序"><a href="#Set和存储顺序" class="headerlink" title="Set和存储顺序"></a>Set和存储顺序</h4><blockquote>
+<ul>
+<li>Set(interface)：存入Set的每个元素必须唯一（定义equals()方法确保唯一性），Set接口不保证维护元素的次序</li>
+<li>HashSet：快速查找，存入其中的元素必须定义hashCode()方法</li>
+<li>TreeSet：保持次序的Set，底层为树结构。元素必须实现Comparable接口</li>
+<li>LinkedHashSet：具有HashSet的查找速度，使用链表维护元素的顺序（插入的顺序），元素必须定义hashCode()方法</li>
+<li>SortedSet（TreeSet的基类）：元素可以保证处于排序状态（按对象的比较函数对元素排序），comparator()返回当前Set使用的Comparator。</li>
+</ul>
+</blockquote>
+<h4 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h4><p>Queue可用于并发应用，除此之外，Queue仅有的两个实现时LinkedList和PriorityQueue，它们之间的差异在于排序的行为而不是性能。</p>
+<h4 id="优先级队列"><a href="#优先级队列" class="headerlink" title="#优先级队列"></a>#优先级队列</h4><p>常用在to－do列表中，实现方式是通过Comparable比较来实现primary与secondary的。</p>
+<h4 id="双向队列"><a href="#双向队列" class="headerlink" title="#双向队列"></a>#双向队列</h4><p>你可以在两端添加或移除元素，LinkedList包含支持双向队列的方法，但LinkedList没有显示的用于双向队列的接口，因此可以使用组合来创建一个类，从LinkedList中暴露相关的方法。</p>
+<h4 id="理解Map"><a href="#理解Map" class="headerlink" title="理解Map"></a>理解Map</h4><p>线性搜索的执行速度会很慢，性能显然不够用，而HashMap是怎么提高查询速度的呢？</p>
+<p>原因是HashMap使用了特殊的值，称为<strong>散列码</strong>。散列码是相对唯一的，用以代表对象的int值，它通过将该对象的某些信息转换而生成的。hashCode()是根类Object中的方法，所以<strong>所有的Java对象都能产生散列码</strong>。</p>
+<h4 id="SortedMap"><a href="#SortedMap" class="headerlink" title="#SortedMap"></a>#SortedMap</h4><p>SortedMap，与SorteSet类似，也拥有comparator()，返回第一个、最后一个键，生成从头开始的或是以哪里结束的子集。除此之外，它还拥有subMap(fromKey, toKey)来生成指定位置的子集。</p>
+<h4 id="LinkedHashMap"><a href="#LinkedHashMap" class="headerlink" title="#LinkedHashMap"></a>#LinkedHashMap</h4><ul>
+<li>散列化所有的元素，遍历键值对时以插入时的顺序返回。</li>
+<li>在构造器中设定LinkedHashMap，使其采用最近最少使用（LRU，Least-recently-used）算法，没有被访问过的元素会出现在队列的前面——对于需要定期清理的程序此方法很奏效。</li>
+</ul>
+<h4 id="散列与散列码"><a href="#散列与散列码" class="headerlink" title="#散列与散列码"></a>#散列与散列码</h4><p>使用Object的hashCode()方法生成的散列码，默认使用对象的地址计算散列码。HashMap使用equals()判断当前的键是否与表中存在的键相同，正确的equals()方法必须满足下列五个条件：</p>
+<ul>
+<li>自反性。任意的x，x.equals(x)为true</li>
+<li>对称性。任意的x，y，y.equals(x)为true，且x.equals(y)也为true</li>
+<li>传递性。任意的x，y，z，x.equals(y)为true，y.equals(z)为true，那么x.equals(z)肯定为true</li>
+<li>一致性。对任意的x，y，若对象中用于等价比较的信息没有改变，无论调用x.equals(y)多少次，返回值都应该是固定的（要么为true要么为false）</li>
+<li>对任何不是null的x，x.equals(null)一定为false</li>
+</ul>
+<p>所以，要想自定义HashMap类，必须同时重载hashCode()方法与equals()方法。</p>
+<p>散列的目的是使用一个对象来查找另一个对象。散列将键保存在某处，而使用存储元素最快的数据结构——数组来表示键的信息，数组不保存键本身，通过键对象生成一个数字，将其作为数组的下标，这个数字就是<strong>散列码</strong>。</p>
+<p>所以查询一个值的步骤大致是，先计算散列码，再使用散列码查询数组。但是不可避免的会存在不同的key产生了相同的散列码的情况（常称之为冲突），基于此，产生了外部链接的处理方式：相同的散列码空间下存放一个list，list的中存放不同的值，查询到此时，便使用equals()方法进行线性查询。由于线性查询的效率低下，所以在之前的散列码分布上应该尽可能的均匀，这样就可以达到快速跳转到相对应的散列码上，进而进行小范围的线性查询从而得出结果。</p>
+<p>散列表通常是由桶位（bucket）和每一个桶位中的LinkedList组成的。为使散列分布均匀，桶的数量通常使用2点整数次方。</p>
+<h4 id="HashMap的性能因子"><a href="#HashMap的性能因子" class="headerlink" title="HashMap的性能因子"></a>HashMap的性能因子</h4><ul>
+<li>容量：表中桶位数</li>
+<li>尺寸：表中当前储存的项目数</li>
+<li>负载因子：尺寸/容量。当负载情况到达了该负载因子水平时，容器将自动增加其容量（桶位数），实现方式是将容量加倍，重新将现有的对象分配到新的桶位中（再散列）。<strong>通常默认负载因子是0.75（即表达到四分之三满时将会进行再散列）</strong>。所以我们应该尽可能的提前预估初始容量从而避免自动再散列的开销。</li>
+</ul>
+<h4 id="Collections实用的方法"><a href="#Collections实用的方法" class="headerlink" title="Collections实用的方法"></a>Collections实用的方法</h4><pre><code>swap(List, int i, int j);    //交换List中位置i与j的元素，效率很高
+frequency(Collection, Object x);    //返回Collection中等于x的元素个数
+binarySearch();        //二分法搜索，如果使用Comparator进行排序，必须使用相同的Comparator（e.g. String.CASE_INSENSITIVE_ORDER）
+Collections.unmodifiableCollection();        //创建不可修改的Collection类（只读容器）
+</code></pre><h1 id="18-JavaIO系统"><a href="#18-JavaIO系统" class="headerlink" title="18.JavaIO系统"></a>18.JavaIO系统</h1><h4 id="File类"><a href="#File类" class="headerlink" title="File类"></a>File类</h4><p>即能代表一个特定文件名称，又能代表一个目录下一组文件的名称。</p>
+<h4 id="目录列表器"><a href="#目录列表器" class="headerlink" title="#目录列表器"></a>#目录列表器</h4><p>使用File中的list()方法时，若不传入参数，可以获得此File对象中的所有列表；但想要获得一个受限的列表，我们可以实现FilenameFilter接口，来获取到想要的文件列表（例如，拓展名都为”.java”的）</p>
+<h4 id="目录实用工具"><a href="#目录实用工具" class="headerlink" title="#目录实用工具"></a>#目录实用工具</h4><p>通过使用local()方法产生由本地目录文件构成的File对象数组，使用walk()方法产生给定目录下的由整个目录树中所有文件构成的List<file>。</file></p>
+<h4 id="输入与输出"><a href="#输入与输出" class="headerlink" title="输入与输出"></a>输入与输出</h4><ol>
+<li>缓冲输入文件：通过向BufferedReader传入FileReader来将文件输入到缓冲区，通过BufferedReader.readLine()方法可以读取一行文件数据信息。</li>
+<li>从内存输入：StringReader.read()每次读取一个字符。</li>
+<li>格式化的内存输入：将产生的字符串通过使用getBytes()方法变成String数组，传入ByteArrayInputStream，之后使用DataInputStream.readByte()每次一个字节的读取字符。</li>
+<li>基本的文件输出：PrintWriter类中的println()方法可以向文件中写入数据。</li>
+<li>存储和恢复数据：使用DataOutputStream写入数据，使用DataInputStream读取数据。</li>
+</ol>
+<h4 id="标准输入与输出（I-O）"><a href="#标准输入与输出（I-O）" class="headerlink" title="标准输入与输出（I/O）"></a>标准输入与输出（I/O）</h4><p>标准I/O源自UNIX中”程序所使用的单一信息流”，程序中的所有输入可以来自于标准输入，所有的输出也可以来自于标准的输出，甚至一个程序的标准输出可以做为另一个程序的标准输入。</p>
+<h4 id="对象序列化"><a href="#对象序列化" class="headerlink" title="对象序列化"></a>对象序列化</h4><p>对象序列化，实现Serializable接口将对象转换成一个序列，并能够将这个序列恢复为原来的对象。”持久性”指一个序列化对象的生命周期并不依赖于程序是否正在运行，通过将一个序列化对象写入磁盘，重新调用的时候将其恢复成该对象，就可以实现持久性的效果。</p>
+<p>要序列化一个对象，创建一个类的OutputSteam对象，将其传入ObjectOutputStream中做为参数，之后用writeObject()即可将对象序列化。相对应的在ObjectInputStream中调用readObject()即可将对象从序列化中恢复出来。</p>
+<p>当对对象序列化时，我们可能不希望某些敏感信息也被序列化（如密码），好的一点是，在Serializable中可以使用transient（瞬时）关键字来标志某个对象不被序列化。</p>
+<h4 id="Preference（偏好）"><a href="#Preference（偏好）" class="headerlink" title="Preference（偏好）"></a>Preference（偏好）</h4><p>可以自动存储和读取信息，但只能用于小的、受限的数据集合（基本类型和字符串），每个字符串的存储长度不能超过8K</p>
+<h1 id="19-枚举类型"><a href="#19-枚举类型" class="headerlink" title="19.枚举类型"></a>19.枚举类型</h1><pre><code>values()：遍历enum实例。
+ordinal()：返回int值，每个enum实例在声明时的次序。
+</code></pre><h4 id="使用接口实现其子类化"><a href="#使用接口实现其子类化" class="headerlink" title="使用接口实现其子类化"></a>使用接口实现其子类化</h4><p>enum不能有子类继承，所以拓展enum的唯一策略就是实现接口</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Detolv Wang</h4>
+    <p>A designer, developer and entrepreneur. Spends his time travelling the world with a bag of kites. Likes journalism and publishing platforms.</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://detolv.com/2016/05/23/Thinking in Java/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://detolv.com/2016/05/23/Thinking in Java/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://detolv.com/2016/05/23/Thinking in Java/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2016/05/23/对象导论/">
+        对象导论 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">在路上</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>
