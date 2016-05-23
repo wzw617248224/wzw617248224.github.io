@@ -95,8 +95,46 @@
 </table>
 <p>所有的Activity默认的窗口类型都是TYPE_APPLICATION，WmS在进行窗口叠加时，会动态改变应用窗口的层值，但层值不会大于99。</p>
 <ol>
-<li>子窗口类型<br>|定义|意义|<br>| ————- |:————-:|<br>|FIRST_SUB_WINDOW(F) = 1000|第一个子窗口<br>|TYPE_APPLICATION_PANEL = FIRST_SUB_WINDOW|应用窗口的子窗口，PopupWindow的默认类型<br>|TYPE_APPLICATION_MEDIA = FIRST_SUB_WINDOW + 1|用来显示Media的窗口<br>|TYPE_APPLICATION_SUB_PANEL = FIRST_SUB_WINDOW + 2|TYPE_APPLICATION_PANEL的子窗口<br>|TYPE_APPLICATION_ATTACHED_DIALOG = FIRST_SUB_WINDOW + 3|OptionMenu、ContextMenu的默认类型<br>|TYPE_APPLICATION_MEDIA_OVERLAY = FIRST_SUB_WINDOW + 4|TYPE_APPLICATION_MEDIA的重影窗口，显示在TYPE_APPLICATION_MEDIA和应用窗口之间<br>|LAST_SUB_WINDOW = 1999|最后一个子窗口</li>
+<li>子窗口类型</li>
 </ol>
+<table>
+<thead>
+<tr>
+<th>定义</th>
+<th style="text-align:center">意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FIRST_SUB_WINDOW(F) = 1000</td>
+<td style="text-align:center">第一个子窗口</td>
+</tr>
+<tr>
+<td>TYPE_APPLICATION_PANEL = FIRST_SUB_WINDOW</td>
+<td style="text-align:center">应用窗口的子窗口，PopupWindow的默认类型</td>
+</tr>
+<tr>
+<td>TYPE_APPLICATION_MEDIA = FIRST_SUB_WINDOW + 1</td>
+<td style="text-align:center">用来显示Media的窗口</td>
+</tr>
+<tr>
+<td>TYPE_APPLICATION_SUB_PANEL = FIRST_SUB_WINDOW + 2</td>
+<td style="text-align:center">TYPE_APPLICATION_PANEL的子窗口</td>
+</tr>
+<tr>
+<td>TYPE_APPLICATION_ATTACHED_DIALOG = FIRST_SUB_WINDOW + 3</td>
+<td style="text-align:center">OptionMenu、ContextMenu的默认类型</td>
+</tr>
+<tr>
+<td>TYPE_APPLICATION_MEDIA_OVERLAY = FIRST_SUB_WINDOW + 4</td>
+<td style="text-align:center">TYPE_APPLICATION_MEDIA的重影窗口，显示在TYPE_APPLICATION_MEDIA和应用窗口之间</td>
+</tr>
+<tr>
+<td>LAST_SUB_WINDOW = 1999</td>
+<td style="text-align:center">最后一个子窗口</td>
+</tr>
+</tbody>
+</table>
 <p>创建子窗口时，客户端可以指定窗口类型介于1000-1999之间，而WmS在进行窗口叠加时，会动态调整层值。</p>
 <ol>
 <li>系统窗口</li>
