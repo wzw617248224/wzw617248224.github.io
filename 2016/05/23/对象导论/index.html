@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>对象导论 | 在路上</title>
+  <meta name="description" content="除了情怀，还有诗和远方" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="在路上">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(//blog.ghost.org/content/images/2013/Nov/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="//blog.ghost.org/content/images/2013/Nov/bloglogo_1-1.png" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">在路上</h1>
+            <h2 class="blog-description">除了情怀，还有诗和远方</h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2016-05-23T06:33:22.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+</span>
+    <h1 class="post-title">对象导论</h1>
+    <section class="post-content">
+      <h4 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h4><p>在继承关系中，我们习惯称子类为导出类，它所继承的父类为基类。</p>
+<ul>
+<li>向上转型：<strong>向继承结构的上层转型为一个更泛化的类型</strong>，将导出类看做是其基类的过程，这种转型是安全的。</li>
+<li>多态：在程序运行时，调用父类方法中所抽象的接口，Java会自动寻找到所对应的子类的实现方法。正是因为Java的特殊设计方式，多态使得事情变得简单。但由于多态的固有特性，在程序运行时，你需要知道怎样去通过其来设计，即使程序设计用到了向上转型，该对象也需要知道要执行怎样的正确行为。</li>
+</ul>
+<h4 id="绑定"><a href="#绑定" class="headerlink" title="绑定"></a>绑定</h4><ul>
+<li>前期绑定：编译器产生一个具体的函数名称调用，在程序运行时将此调用解析到将要被执行的代码的<strong>绝对地址</strong>。但在OOP中，程序在运行的时候才能够知道代码的绝对地址，所以必须采用其他的机制。</li>
+<li>后期绑定：编译器首先要确保被调用的方法存在，并<strong>对调用参数和返回值执行类型检查</strong>——无法提供此类保障的语言称为<em>弱类型</em>的，并不知道将要被执行的确切的代码。</li>
+</ul>
+<p><em>注：在某些语言中，必须声明某些方法具备后期绑定的属性才能够使用（e.g.C++中使用virtual来声明）。在Java中，<strong>动态绑定是默认的行为</strong>，不需添加声明关键字。</em></p>
+<h4 id="单继承结构"><a href="#单继承结构" class="headerlink" title="单继承结构"></a>单继承结构</h4><p>在OOP中，需要解决一个很重要的问题，<em>是否所有的类都继承于同一个基类？</em>在Java语言中中的确是这样，这个终极基类就是<strong>Object</strong>——单继承结构带来了很多好处。</p>
+<ul>
+<li>所有的对象都有一个共同的接口，归根到底他们都是相同的基本类。</li>
+<li>保证所有的对象都具备某些功能。</li>
+<li>为<strong>垃圾回收机制</strong>提供了便利。</li>
+</ul>
+<h4 id="容器（panel）"><a href="#容器（panel）" class="headerlink" title="容器（panel）"></a>容器（panel）</h4><p>概念：在任何需要时可以对其内容进行扩充，不需要知道到底需要多少对象多少方法，创建一个容器（也称为集合，即Collections类）方法来处理所有细节。</p>
+<p>对于具体容器的选择：</p>
+<ul>
+<li>不同容器提供了不同类型的接口与外部行为，堆栈与队列就是这样。</li>
+<li>不同容器对于某些操作具有不同的效率，e.g. <strong>ArrayList与LinkedList</strong>，在ArrayList中，随机访问元素花费的时间是固定的，但在LinkedList中，访问的元素花费的时间与其靠近表尾的距离成反比（越靠近表尾花费时间越长）；但对LinkedList来说，在其列表中插入一个元素，它的开销比ArrayList的要小。</li>
+</ul>
+<h4 id="参数化类型"><a href="#参数化类型" class="headerlink" title="参数化类型"></a>参数化类型</h4><p>向下转型：向上转型的逆过程，这中转型方式较为危险，当不是确切的知道所要处理的具体对象类型，这种方式几乎是不安全的。但当从容器中取出对象的引用时，必须以某种方式记住这些对象是什么类型，这样才能够正确的执行向下转型。</p>
+<p>Java SE5的重大变化之一就是增加了<strong>参数化类型</strong>，在Java中称之为范型。</p>
+<p>一对尖括号，中间包含类型信息。例如，</p>
+<blockquote>
+<p>ArrayList&lt; Shape &gt; shapes = new ArrayList&lt; Shape &gt;();</p>
+</blockquote>
+<h4 id="对象的创建与其生命周期"><a href="#对象的创建与其生命周期" class="headerlink" title="对象的创建与其生命周期"></a>对象的创建与其生命周期</h4><p>对象的创建：</p>
+<ul>
+<li>将对象置于堆栈（有时被称为自动变量（automatic variable）或是限域变量（scoped variable））或静态储存区域来实现。这种方式必须在编写程序的时候明确知道对象的确切数量、生命周期和类型，对于更为一般的问题来讲，这种方法就显得无能为力了。</li>
+<li>在堆（heap）的内存池中动态地创建对象。在这种方式中，直到运行时才知道需要多少对象，生命周期是什么样，它们具有什么样的类型。动态方式有一个一般性的逻辑假设：<em>对象趋向于变得复杂，所以查找和释放储存空间的开销不会对对象的创建造成重大的冲击</em>。这种动态方式带来的<strong>灵活性</strong>正是解决<strong>一般性</strong>问题所需要的。</li>
+</ul>
+<p>Java完全采用动态分配内存的方式，用new关键字来创建新的对象。</p>
+<p>对象的生命周期：</p>
+<ul>
+<li>在堆栈上创建对象的语言，编译器可以确定对象存在的时间，并可以自动销毁它。</li>
+<li>在堆上创建对象，编译器对其生命周期一无所知（e.g. 在C++语言中，必须通过编程方式来确定何时销毁对象）</li>
+</ul>
+<p>Java采用<strong>“垃圾回收机制”</strong>，它可以用来处理内存释放问题（不包括清理对象的其他方面）。这一点同单根继承结构一起使得Java编程比C++编程要容易得多。</p>
+<h4 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h4><p>异常处理将错误直接置于编程语言中，<strong>异常是一种对象</strong>，它从出错的地点被”抛出”，由专门被设计用来处理特定类型错误的异常处理器来”捕获”。异常处理与程序正常执行是并行的关系，不会干扰到程序的正常执行。<strong><em>异常提供了一种从错误状况进行可靠恢复的途径</em></strong>。</p>
+<p>异常处理早在面向对象语言出现之前就已经存在，它不算是一个面向对象语言的特征。</p>
+<h4 id="并发编程"><a href="#并发编程" class="headerlink" title="并发编程"></a>并发编程</h4><p>并发：对于大量的问题，我们需要将其分解成许多个可独立运行的部分（任务），即就是在同一时刻处理多个任务的思想，从而提高程序的响应能力。这些彼此可独立运行的部分称为线程。</p>
+<p>并发虽然会提高程序的响应，但会带来一个隐患：共享资源。若有多个并行的任务同时访问同一个资源，就会出现问题。例如，两个进程不能同时向一台打印机发送消息。为了解决这个问题，必须在某个任务访问资源时锁定该资源，完成任务后再释放资源锁（同步块），使其他任务可以使用这个资源。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Detolv Wang</h4>
+    <p>A designer, developer and entrepreneur. Spends his time travelling the world with a bag of kites. Likes journalism and publishing platforms.</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://detolv.com/2016/05/23/对象导论/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://detolv.com/2016/05/23/对象导论/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://detolv.com/2016/05/23/对象导论/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <span class="page-number">•</span>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">在路上</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>
