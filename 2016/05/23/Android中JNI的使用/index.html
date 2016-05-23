@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Android中JNI的使用 | 在路上</title>
+  <meta name="description" content="除了情怀，还有诗和远方" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="在路上">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(//blog.ghost.org/content/images/2013/Nov/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="//o7mctx3v4.bkt.clouddn.com/round_corner_image_by_atool.png?attname=&e=1464009405&token=V8ZXziR7NrEO2PZDCUcbsSeLVeTUIiTSdGXXRydw:-Q7oiG6F53IR5D8Nrj45SdBEKys" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">在路上</h1>
+            <h2 class="blog-description">除了情怀，还有诗和远方</h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2016-05-23T13:00:23.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+    
+    | 
+    <a href='/tags/Android/'>Android</a>
+    
+    
+</span>
+    <h1 class="post-title">Android中JNI的使用</h1>
+    <section class="post-content">
+      <h1 id="Android中JNI的使用"><a href="#Android中JNI的使用" class="headerlink" title="Android中JNI的使用"></a>Android中JNI的使用</h1><h3 id="JNI概述"><a href="#JNI概述" class="headerlink" title="JNI概述"></a>JNI概述</h3><p>JNI（Java Native Interface），译为Java本地调用。JNI是一种技术，如下：</p>
+<ul>
+<li>Java程序中的函数可以调用Native语言写的函数，这里的Native一般是指的C/C++语言。</li>
+<li>与此相对应的，Native程序中的函数也可以调用Java层的函数。</li>
+<li>即就是<strong><em>Java可以调用C/C++，而C/C++也可以调用Java</em></strong>。它们彼此可以通过JNI互相调用。</li>
+</ul>
+<h3 id="JNI的用处"><a href="#JNI的用处" class="headerlink" title="JNI的用处"></a>JNI的用处</h3><ul>
+<li>因为承载Java世界的虚拟机是用Native语言编写的，而虚拟机又运行在不同的平台上，所以虚拟机不能够做到与平台无关（跨平台）。所以有了JNI技术后，可以对Java世界屏蔽掉不同平台之间的差异了，从而实现Java的跨平台。</li>
+</ul>
+<p>在Android平台上，JNI是连接Native世界与Java世界的桥梁。如图，</p>
+<p><img src="http://img.blog.csdn.net/20160310111259803" alt="Android平台中JNI示意图"></p>
+<h3 id="一个JNI的实例：MediaScanner"><a href="#一个JNI的实例：MediaScanner" class="headerlink" title="一个JNI的实例：MediaScanner"></a>一个JNI的实例：MediaScanner</h3><p><img src="http://img.blog.csdn.net/20160310141356979" alt="这里写图片描述"></p>
+<ul>
+<li><p>由关系图可以看出Java层对应的是MediaScanner，这个类需要一些函数由Native层来实现。</p>
+</li>
+<li><p>JNI层对应的是libmedia_jni.so。“media”是Native层库的名字，下划线后“jni”表示JNI库。一般采用<strong><em>“lib模块名_jni.so”</em></strong>来命名。</p>
+</li>
+<li><p>Native层对应的是libmedia.so，这个库<strong><em>完成了实际的功能</em></strong>。</p>
+</li>
+<li><p>总结一下就是，<strong><em>MediaScanner通过JNI库libmedia_jni.so与Native层的libmedia.so交互。</em></strong></p>
+</li>
+</ul>
+<p><em>MediaScanner是Android平台中多媒体的重要组成部分，它的功能是扫描媒体文件，获取媒体文件的信息（e.g.歌曲时长，歌曲作者等），并将其存入<strong>媒体数据库</strong>中，以供其他App使用</em></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public class MediaScanner</span><br><span class="line">&#123;</span><br><span class="line">    static &#123;</span><br><span class="line">		/*</span><br><span class="line">		加载对应的JNI库，media_jni是对应的JNI库名称。在实际加载动态库的时候会将其拓展成libmedia_jni.so，Windows下则是media_jni.dll</span><br><span class="line">		*/     </span><br><span class="line">		System.loadLibrary(&quot;media_jni&quot;);</span><br><span class="line">        native_init();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">//非Native函数</span><br><span class="line">public void scanDirectories(String[] directories, String volumeName) &#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//声明一个有Native关键字的函数，表示其将由JNI层完成</span><br><span class="line">    private static native final void native_init();</span><br><span class="line"></span><br><span class="line">    private native void processFile(String path, String mimeType, MediaScannerClient client);</span><br></pre></td></tr></table></figure>
+<p><strong>如果Java要调用Native函数，就必须通过一个位于JNI层的动态库来实现</strong>，动态库就是动态运行时加载的库。</p>
+<p>至于什么时候加载这个库，通行的做法是，在<strong>类的static语句中加载，之后调用System.loadlibrary()方法</strong>。</p>
+<h3 id="关于如何注册JNI函数"><a href="#关于如何注册JNI函数" class="headerlink" title="关于如何注册JNI函数"></a>关于如何注册JNI函数</h3><p>native_init函数对应的JNI函数是android_media_MediaScanner_native_init，这个名字是怎么确定下来的呢？</p>
+<p>native_init函数位于android.media这个包中，它的全路径名应为android.media.MediaScanner.native<em>init。但由于Native语言中“.”有着特殊含义，所以将“.”换成“</em>”。</p>
+<h4 id="JNI函数的注册方法"><a href="#JNI函数的注册方法" class="headerlink" title="JNI函数的注册方法"></a>JNI函数的注册方法</h4><ol>
+<li>静态方法</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//Java层函数名中如果有一个“_”，转换成JNI后就编程了“_l”。</span><br></pre></td></tr></table></figure>
+<p>当Java层调用native_init函数时，它会从对应的JNI库中寻找Java_android_media_MediaScanner_native_linit。若没有会报错。如果找到，则会为这个native_init和Java_android_media_MediaScanner_native_linit建立一个关联关系（<strong>其实质是保存JNI层函数的函数指针</strong>）。以后再次调用该native_init函数时，直接使用该指针即可，<strong>此项工作由虚拟机完成</strong>。</p>
+<p>但是这样静态注册会存在很多弊端，</p>
+<ul>
+<li><p>需要编译所有声明了native函数的Java类，每个所生成的class文件都得用javah生成一个头文件。</p>
+</li>
+<li><p>javah生成的JNI层函数名特别长，书写不便。</p>
+</li>
+<li><p>初次调用native函数时要根据函数名搜索对应的JNI层函数来绑定关系，会影响效率。</p>
+</li>
+</ul>
+<p>基于以上三个弊端，我们可以直接让native函数知道JNI层所对应的函数指针，所以就是接下来要介绍的第二种方法：动态注册法。 </p>
+<ol>
+<li>动态注册</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">typedef struct &#123; </span><br><span class="line">	//Java中native函数的名字，不携带包的路径，“native_init”</span><br><span class="line">    const char* name; //函数的签名信息</span><br><span class="line">    const char* signature; </span><br><span class="line">    void*       fnPtr; //JNI层对应函数的函数指针</span><br><span class="line">&#125; JNINativeMethod;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">/*</span><br><span class="line">env指向一个JNIEnv结构体。className为对应的Java类名（因为JNINativeMethod中使用的函数名并不是全路径，所以要指明是哪个类）。</span><br><span class="line">*/</span><br><span class="line">jclass clazz = (*env)-&gt;FindClass(env, className);</span><br><span class="line"></span><br><span class="line">//调用JNIEnv的RegisterNatives函数，注册关联关系。</span><br><span class="line">(*env)-&gt;RegisterNatives(env, clazz, gMethods, numMethods)</span><br></pre></td></tr></table></figure>
+<p>当Java层通过System.loadLibrary加载完JNI动态库后，紧接着会查找该库中JNI_OnLoad函数。若存在即调用，<em>动态注册的工作在此完成</em>。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Detolv Wang</h4>
+    <p>专注，严肃，活泼，有趣</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://detolv.com/2016/05/23/Android中JNI的使用/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://detolv.com/2016/05/23/Android中JNI的使用/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://detolv.com/2016/05/23/Android中JNI的使用/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2016/05/23/Android系统架构/">
+        ← Android系统架构
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2016/05/23/一个像素转换工具类的实现——dp,px,sp之间的相互转换/">
+        一个像素转换工具类的实现——dp,px,sp之间的相互转换 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">在路上</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

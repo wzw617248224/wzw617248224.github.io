@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>浅析Context | 在路上</title>
+  <meta name="description" content="除了情怀，还有诗和远方" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="在路上">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(//blog.ghost.org/content/images/2013/Nov/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="//o7mctx3v4.bkt.clouddn.com/round_corner_image_by_atool.png?attname=&e=1464009405&token=V8ZXziR7NrEO2PZDCUcbsSeLVeTUIiTSdGXXRydw:-Q7oiG6F53IR5D8Nrj45SdBEKys" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">在路上</h1>
+            <h2 class="blog-description">除了情怀，还有诗和远方</h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2016-05-23T13:10:10.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+    
+    | 
+    <a href='/tags/Android/'>Android</a>
+    
+    
+</span>
+    <h1 class="post-title">浅析Context</h1>
+    <section class="post-content">
+      <h2 id="Context是什么？"><a href="#Context是什么？" class="headerlink" title="Context是什么？"></a>Context是什么？</h2><p>Context在android中一般被翻译为“上下文”，但是从语义上来看context更应该被理解为“场景”。</p>
+<p>一个Context意味着一个场景，一个场景就是用户和操作系统交互的过程。比如，当你打电话的时候，场景包括电话交互界面以及它隐藏在背后的数据。</p>
+<p>从代码中可以看出Activity类是基于Context，Service类也是基于Context的。从设计的角度看Activity除了基于Context外，还实现了其他的一些接口，这些接口只是为了扩充Context的功能。所以扩充后的类称为一个Activity或者是一个Service。</p>
+<h2 id="Context相关类的继承关系："><a href="#Context相关类的继承关系：" class="headerlink" title="Context相关类的继承关系："></a>Context相关类的继承关系：</h2><p>如图：<br><img src="http://img.my.csdn.net/uploads/201203/1/0_1330607569Vj4c.gif" alt="Context相关类的继承关系"></p>
+<p>从图中可以看出Activity是继承于Context的，所以如果需要在Activity以外调用API时，可以这样使用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Context context;  </span><br><span class="line">context.getString(R.string.app_name);</span><br></pre></td></tr></table></figure></p>
+<h2 id="关于一个App里到底有多少个Context"><a href="#关于一个App里到底有多少个Context" class="headerlink" title="关于一个App里到底有多少个Context"></a>关于一个App里到底有多少个Context</h2><ol>
+<li>一个应用程序有多少个Activity和Service就会有多少个Context；</li>
+<li>不过，有的方法会返回一个全局的Context对象（全局引用），这一点可能会让读者困惑。</li>
+</ol>
+<p>例如，getApplication（）方法，以及getResources（）等等。</p>
+<p>通过前面的分析，可知一个应用程序App共有的Context数目公式为：</p>
+<blockquote>
+<p>总Context实例个数 = Service个数 + Activity个数 + 1（Application对应的Context实例）</p>
+</blockquote>
+<h2 id="Context的继承类的解析"><a href="#Context的继承类的解析" class="headerlink" title="Context的继承类的解析"></a>Context的继承类的解析</h2><p>Context是一个纯abstract类，为了使用方便这里产生了ContextWrapper类。ContextWrapper 实现了所有方法，但是他只是一个代理，这种在设计模式里叫<strong>代理模式（Proxy）。一个是真正的你要访问的对象(目标类)，一个是代理对象,真正对象与代理对象实现同一个接口,先访问代理类再访问真正要访问的对象。代理对象可以在客户端与目标对象之间起到中介的作用。</strong></p>
+<p>由图一可以看出ContextWrapper（包装）类是Context的继承类，这个类只是一个包装类而已。ContextWrapper的构造函数中必须包含一个真正的Context引用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public ContextWrapper(Context base) &#123;  </span><br><span class="line">    mBase = base;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ContextWrapper提供了attachBaseContext（）用于给ContextWrapper对象中指定真正的Context对象，调用ContextWrapper的方法都会被转向起所包含的真正的Context对象：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">protected void attachBaseContext(Context base) &#123;  </span><br><span class="line">    if (mBase != null) &#123;  </span><br><span class="line">        throw new IllegalStateException(&quot;Base context already set&quot;);  </span><br><span class="line">    &#125;  </span><br><span class="line">    mBase = base;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>之后是ContextThemeWrapper类，其内部包含了主题（Theme）相关的接口，这的主题就是在AndroidManifest.xml中通过android:theme为Application元素或者Activity元素定义的主题。</p>
+<h2 id="创建Context"><a href="#创建Context" class="headerlink" title="创建Context"></a>创建Context</h2><p>每一个Activity本质上就是一个Context，必须为其指定真正的Context对象，而真正实现Context类的是ContextImpl类。</p>
+<ol>
+<li>创建Application的时机</li>
+</ol>
+<p>每个应用程序在第一次启动的时候，都会首先创建一个Application对象。程序第一次启动是，会调用到handleBindApplication()方法中，该方法在if(data.instrumentationName ！= null)条件下，创建了ContextImpl对象。但是该条件只有当创建了一个Android Unit Test工程时，才会满足该条件。<br>若不是测试工程，则调用makeApplication()方法，代码如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">//创建Application时同时创建的ContextIml实例 </span><br><span class="line">private final void handleBindApplication(AppBindData data)&#123; </span><br><span class="line">    ... </span><br><span class="line">    ///创建Application对象 </span><br><span class="line">    Application app = data.info.makeApplication(data.restrictedBackupMode, null); </span><br><span class="line">    ... </span><br><span class="line">&#125; </span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">public Application makeApplication(boolean forceDefaultAppClass, Instrumentation instrumentation) &#123; </span><br><span class="line">    ... </span><br><span class="line">    try &#123; </span><br><span class="line">       java.lang.ClassLoader cl = getClassLoader(); </span><br><span class="line"></span><br><span class="line">        ContextImpl appContext = new ContextImpl();    //创建一个ContextImpl对象实例 </span><br><span class="line"></span><br><span class="line">        appContext.init(this, null, mActivityThread);  //初始化该ContextIml实例的相关属性，第一个参数只当前的PackageInfo对象，</span><br><span class="line">						       //该对象赋值给ContextImpl类中的成员变量mPackageInfo/</span><br><span class="line">		</span><br><span class="line">		//新建一个Application对象  </span><br><span class="line">		app = mActivityThread.mInstrumentation.newApplication( </span><br><span class="line"></span><br><span class="line">                cl, appClass, appContext); </span><br><span class="line"></span><br><span class="line">       appContext.setOuterContext(app);  //将该Application实例传递给该ContextImpl实例          </span><br><span class="line"></span><br><span class="line">    &#125;  </span><br><span class="line"></span><br><span class="line">    ... </span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2.创建Activity的时机</p>
+<p>通过startActivity()或startActiv ityForResult()请求启动一个Activity()时，如果系统检测需要新建一个Activity对象时，就会回调handleLaunchActivity()方法，之后再调用performLaunchActivity()方法，去创建一个Activity实例，方法如下<br>//创建一个Activity实例时同时创建ContextIml实例 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">private final void handleLaunchActivity(ActivityRecord r, Intent customIntent) &#123; </span><br><span class="line"></span><br><span class="line">    ... </span><br><span class="line"></span><br><span class="line">    Activity a = performLaunchActivity(r, customIntent);  //启动一个Activity </span><br><span class="line"></span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line">private final Activity performLaunchActivity(ActivityRecord r, Intent customIntent) &#123; </span><br><span class="line"></span><br><span class="line">    ... </span><br><span class="line"></span><br><span class="line">    Activity activity = null; </span><br><span class="line"></span><br><span class="line">    try &#123; </span><br><span class="line">        //创建一个Activity对象实例 </span><br><span class="line"></span><br><span class="line">        java.lang.ClassLoader cl = r.packageInfo.getClassLoader(); </span><br><span class="line"></span><br><span class="line">        activity = mInstrumentation.newActivity(cl, component.getClassName(), r.intent); </span><br><span class="line"></span><br><span class="line">    &#125; </span><br><span class="line"></span><br><span class="line">    if (activity != null) &#123; </span><br><span class="line"></span><br><span class="line">        ContextImpl appContext = new ContextImpl();      //创建一个Activity实例 </span><br><span class="line"></span><br><span class="line">        appContext.init(r.packageInfo, r.token, this);   //初始化该ContextIml实例的相关属性 </span><br><span class="line"></span><br><span class="line">        appContext.setOuterContext(activity);            //将该Activity信息传递给该ContextImpl实例 </span><br><span class="line"></span><br><span class="line">        ... </span><br><span class="line"></span><br><span class="line">    &#125; </span><br><span class="line"></span><br><span class="line">    ...     </span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3.创建Service对象的时机<br>通过startService或bindService时，如果系统检测到需要新建一个Service实例，就会回调handleCreateService()方法，如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">//创建一个Service实例时同时创建ContextIml实例 </span><br><span class="line"></span><br><span class="line">private final void handleCreateService(CreateServiceData data)&#123; </span><br><span class="line"></span><br><span class="line">    ... </span><br><span class="line"></span><br><span class="line">    //创建一个Service实例 </span><br><span class="line"></span><br><span class="line">    Service service = null; </span><br><span class="line"></span><br><span class="line">    try &#123; </span><br><span class="line"></span><br><span class="line">        java.lang.ClassLoader cl = packageInfo.getClassLoader(); </span><br><span class="line"></span><br><span class="line">        service = (Service) cl.loadClass(data.info.name).newInstance(); </span><br><span class="line"></span><br><span class="line">    &#125; catch (Exception e) &#123; </span><br><span class="line"></span><br><span class="line">    &#125; </span><br><span class="line"></span><br><span class="line">    ... </span><br><span class="line"></span><br><span class="line">    ContextImpl context = new ContextImpl(); //创建一个ContextImpl对象实例 </span><br><span class="line"></span><br><span class="line">    context.init(packageInfo, null, this);   //初始化该ContextIml实例的相关属性 </span><br><span class="line"></span><br><span class="line">    //获得我们之前创建的Application对象信息 </span><br><span class="line"></span><br><span class="line">    Application app = packageInfo.makeApplication(false, mInstrumentation); </span><br><span class="line"></span><br><span class="line">    //将该Service信息传递给该ContextImpl实例 </span><br><span class="line"></span><br><span class="line">    context.setOuterContext(service); </span><br><span class="line"></span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>由上，对ContextImpl的分析得到，其方法的多数 操作都是直接调用其内部变量mPackageInfo，而mPackageInfo指向同一个PackageInfo对象。<strong>这种设计结构一般意味着ContextImpl类是一种轻量类，而PackageInfo是一个重量级类。</strong>多个ContextImpl对象都指向同一个PackageInfo。因此，从系统的效率来看也是合理的。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Detolv Wang</h4>
+    <p>专注，严肃，活泼，有趣</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://detolv.com/2016/05/23/浅析Context/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://detolv.com/2016/05/23/浅析Context/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://detolv.com/2016/05/23/浅析Context/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2016/05/23/Android窗口机制/">
+        ← Android窗口机制
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2016/05/23/Android系统架构/">
+        Android系统架构 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">在路上</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

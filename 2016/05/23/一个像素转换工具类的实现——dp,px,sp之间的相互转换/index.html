@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>一个像素转换工具类的实现——dp,px,sp之间的相互转换 | 在路上</title>
+  <meta name="description" content="除了情怀，还有诗和远方" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="在路上">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(//blog.ghost.org/content/images/2013/Nov/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="//o7mctx3v4.bkt.clouddn.com/round_corner_image_by_atool.png?attname=&e=1464009405&token=V8ZXziR7NrEO2PZDCUcbsSeLVeTUIiTSdGXXRydw:-Q7oiG6F53IR5D8Nrj45SdBEKys" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">在路上</h1>
+            <h2 class="blog-description">除了情怀，还有诗和远方</h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2016-05-23T12:59:30.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+    
+    | 
+    <a href='/tags/Android/'>Android</a>
+    
+    
+</span>
+    <h1 class="post-title">一个像素转换工具类的实现——dp,px,sp之间的相互转换</h1>
+    <section class="post-content">
+      <h3 id="什么是dp-px-sp"><a href="#什么是dp-px-sp" class="headerlink" title="什么是dp,px,sp"></a>什么是dp,px,sp</h3><ul>
+<li><p>dp ：在Android中dp（也即dip，device independent pixels，<strong>设备独立像素</strong>），一个基于density的抽象单位，不依赖于像素，推荐使用。当densityDip=160时，1dp=1px。</p>
+</li>
+<li><p>px：pixels（像素），即就是屏幕的像素点。</p>
+</li>
+<li><p>sp：同dp相似，但还会根据用户的字体大小偏好来缩放(<strong>一般建议使用sp作为文本的单位</strong>，其它用dp)</p>
+</li>
+</ul>
+<h3 id="dip介绍"><a href="#dip介绍" class="headerlink" title="dip介绍"></a>dip介绍</h3><ul>
+<li>QVGA： density=0.75(120/160) densityDpi=120 QVGA（240*320）</li>
+<li>HVGA：density=1.0(160/160) densityDpi=160 HVGA（320*480）</li>
+<li>WVGA：density = 1.5(240/160) densityDpi=240  WVGA（480*800）</li>
+<li>WQVGA：density=2.0 densityDpi=120 WQVGA（240*400）</li>
+</ul>
+<p><strong>densityDip值表示每英寸有多少个显示点</strong></p>
+<p>我们一般在项目中会定义多个适配资源文件夹(values-XXX,drawable-XXX等)</p>
+<ul>
+<li>drawable-ldpi：     屏幕密度为120的手机设备</li>
+<li>drawable-mdpi：   屏幕密度为160的手机设备（此为baseline，其他均以此为基准，在此设备上，1dp = 1px）</li>
+<li>drawable-hdpi：    屏幕密度为240的手机设备</li>
+<li>drawable-xhdpi：  屏幕密度为320的手机设备<br>drawable-xxhdpi：屏幕密度为480的手机设备</li>
+</ul>
+<h3 id="dp与px之间相互转换"><a href="#dp与px之间相互转换" class="headerlink" title="dp与px之间相互转换"></a>dp与px之间相互转换</h3><h4 id="1-dp与px的换算公式："><a href="#1-dp与px的换算公式：" class="headerlink" title="1.dp与px的换算公式："></a>1.dp与px的换算公式：</h4><p>dips=(pixs<em>160)/densityDpi<br>pixs =dips </em> (densityDpi/160)</p>
+<h4 id="2-dp与px的代码实现："><a href="#2-dp与px的代码实现：" class="headerlink" title="2.dp与px的代码实现："></a>2.dp与px的代码实现：</h4><p><em>注意在代码里面进行转化的时候还需要有一个偏移值：<strong>0.5f</strong></em></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"> /**</span><br><span class="line">  * dp转 px.</span><br><span class="line">  *</span><br><span class="line">  * @param dipValue </span><br><span class="line">  * @return the int</span><br><span class="line">  */</span><br><span class="line"> public static int dp2px(float dipValue) &#123;</span><br><span class="line">     final float scale = mContext.getResources().getDisplayMetrics().densityDpi;</span><br><span class="line">     return (int) (dipValue * (scale / 160) + 0.5f);</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line">/**</span><br><span class="line">  * px转dp.</span><br><span class="line">  *</span><br><span class="line">  * @param pxValue </span><br><span class="line">  * @return the int</span><br><span class="line">  */</span><br><span class="line"> public static int px2dp(float pxValue) &#123;</span><br><span class="line">     final float scale = mContext.getResources().getDisplayMetrics().densityDpi;</span><br><span class="line">     return (int) ((pxValue * 160) / scale + 0.5f);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="sp与px转换"><a href="#sp与px转换" class="headerlink" title="sp与px转换"></a>sp与px转换</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">   /**</span><br><span class="line">     * sp转px.</span><br><span class="line">     *</span><br><span class="line">     * @param spValue the value</span><br><span class="line">     * @return the int</span><br><span class="line">     */</span><br><span class="line">    public static int sp2px(float spValue ) &#123;</span><br><span class="line">        Resources r;</span><br><span class="line">        if (mContext == null) &#123;</span><br><span class="line">            r = Resources.getSystem();</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            r = mContext.getResources();</span><br><span class="line">        &#125;</span><br><span class="line">        float pxValue = spValue * r.getDisplayMetrics().scaledDensity;</span><br><span class="line">        return (int) (pxValue + 0.5f);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line">     * px转sp.</span><br><span class="line">     *</span><br><span class="line">     * @param pxValue the value</span><br><span class="line">     * @return the int</span><br><span class="line">     */</span><br><span class="line">    public static int px2sp(float pxValue) &#123;</span><br><span class="line">        final float scale = mContext.getResources().getDisplayMetrics().scaledDensity;</span><br><span class="line">        return (int) (pxValue / scale + 0.5f);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="关于什么是ppi"><a href="#关于什么是ppi" class="headerlink" title="关于什么是ppi"></a>关于什么是ppi</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PPI = √（长度像素数² + 宽度像素数²） / 屏幕对角线英寸数</span><br></pre></td></tr></table></figure>
+<p>e.g.  iphone5的ppi是多少？ppi=√（1136px² + 640px²）/4 in=326ppi（视网膜Retina屏）.</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Detolv Wang</h4>
+    <p>专注，严肃，活泼，有趣</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://detolv.com/2016/05/23/一个像素转换工具类的实现——dp,px,sp之间的相互转换/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://detolv.com/2016/05/23/一个像素转换工具类的实现——dp,px,sp之间的相互转换/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://detolv.com/2016/05/23/一个像素转换工具类的实现——dp,px,sp之间的相互转换/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2016/05/23/Android中JNI的使用/">
+        ← Android中JNI的使用
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2016/05/23/面向对象的设计方法与UML/">
+        面向对象的设计方法与UML →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">在路上</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

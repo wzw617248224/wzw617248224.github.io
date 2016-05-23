@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Android窗口机制 | 在路上</title>
+  <meta name="description" content="除了情怀，还有诗和远方" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="在路上">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(//blog.ghost.org/content/images/2013/Nov/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="//o7mctx3v4.bkt.clouddn.com/round_corner_image_by_atool.png?attname=&e=1464009405&token=V8ZXziR7NrEO2PZDCUcbsSeLVeTUIiTSdGXXRydw:-Q7oiG6F53IR5D8Nrj45SdBEKys" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">在路上</h1>
+            <h2 class="blog-description">除了情怀，还有诗和远方</h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2016-05-23T13:16:55.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+    
+    | 
+    <a href='/tags/Android/'>Android</a>
+    
+    
+</span>
+    <h1 class="post-title">Android窗口机制</h1>
+    <section class="post-content">
+      <h2 id="总览"><a href="#总览" class="headerlink" title="总览"></a>总览</h2><p>在Android中，窗口的管理系统是基于C/S模式的。其中，客户端负责请求创建窗口、使用窗口，而服务端则完成窗口的维护、显示。</p>
+<p><img src="http://img.my.csdn.net/uploads/201208/18/1345220885_1077.png" alt="窗口与client"><br>如图所示，在Client端，并不是直接与Wms交互，而是通过本地对象WindowManager，然后由WindowManager完成和WmS的交互。对于Android应用来说，<strong>这个交互是透明的，即应用不能感知到WmS的存在。</strong></p>
+<h2 id="窗口的类型"><a href="#窗口的类型" class="headerlink" title="窗口的类型"></a>窗口的类型</h2><p>FrameWork定义了三种窗口的类型，定义在WindowManager中，</p>
+<ul>
+<li>第一种是应用窗口：该窗口对应一个Activity，由于加载Activity是由AmS完成的，所以在应用程序中创建一个应用类窗口，只能在Activity内部完成。</li>
+<li>第二种是子窗口：该窗口必须有一个父窗口，父窗口可以是应用窗口或者其他任何类型窗口。</li>
+<li>第三种是系统窗口：系统窗口不需要对应任何Activity或是得有一个父窗口。所有的应用程序都没有创建该窗口的权限。但是系统进程可以创建系统窗口。</li>
+</ul>
+<p>WindowManager对这三种类型采用了Z-order顺序管理，即每一个类型用一个int常量表示，代表了窗口对应的层（layer）。WmS在进行窗口叠加时，会按照int大小分配不同层，int值越大，代表层的位置越靠上。</p>
+<ol>
+<li>应用窗口类型</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>定义</th>
+<th style="text-align:center">意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FIRST_APPLICATION_WINDOW = 1</td>
+<td style="text-align:center">第一个应用窗口</td>
+</tr>
+<tr>
+<td>TYPE_BASE_APPLICATION = 1</td>
+<td style="text-align:center">基窗口，所有其他类型的应用窗口将出现在基窗口上层</td>
+</tr>
+<tr>
+<td>TYPE_APPLICATION = 2</td>
+<td style="text-align:center">所有Activity对应的窗口</td>
+</tr>
+<tr>
+<td>TYPE_APPLICATION_STARTING = 3</td>
+<td style="text-align:center">应用程序启动时先显示此窗口，当真正的窗口配置完成后，此窗口被关闭</td>
+</tr>
+<tr>
+<td>LAST_APPLICATION_WINDOW = 99</td>
+<td style="text-align:center">最后一个应用窗口</td>
+</tr>
+</tbody>
+</table>
+<p>所有的Activity默认的窗口类型都是TYPE_APPLICATION，WmS在进行窗口叠加时，会动态改变应用窗口的层值，但层值不会大于99。</p>
+<ol>
+<li>子窗口类型<br>|定义|意义|<br>| ————- |:————-:|<br>|FIRST_SUB_WINDOW(F) = 1000|第一个子窗口<br>|TYPE_APPLICATION_PANEL = FIRST_SUB_WINDOW|应用窗口的子窗口，PopupWindow的默认类型<br>|TYPE_APPLICATION_MEDIA = FIRST_SUB_WINDOW + 1|用来显示Media的窗口<br>|TYPE_APPLICATION_SUB_PANEL = FIRST_SUB_WINDOW + 2|TYPE_APPLICATION_PANEL的子窗口<br>|TYPE_APPLICATION_ATTACHED_DIALOG = FIRST_SUB_WINDOW + 3|OptionMenu、ContextMenu的默认类型<br>|TYPE_APPLICATION_MEDIA_OVERLAY = FIRST_SUB_WINDOW + 4|TYPE_APPLICATION_MEDIA的重影窗口，显示在TYPE_APPLICATION_MEDIA和应用窗口之间<br>|LAST_SUB_WINDOW = 1999|最后一个子窗口</li>
+</ol>
+<p>创建子窗口时，客户端可以指定窗口类型介于1000-1999之间，而WmS在进行窗口叠加时，会动态调整层值。</p>
+<ol>
+<li>系统窗口</li>
+</ol>
+<p><img src="http://img.blog.csdn.net/20160304204105262?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="系统窗口"></p>
+<p>创建系统窗口可以指定层值2000~2999之间，WmS在进行窗口d叠加时，会动态改变窗口的层值。系统窗口所独特的一点是，有的系统窗口只能出现一个，例如输入法窗口，否则用户会觉得很乱。<strong>因此，WmS在接受到创建窗口的消息时，会进行一定的检查，确保该窗口只能被创建一次。</strong></p>
+<h2 id="Token变量的意义"><a href="#Token变量的意义" class="headerlink" title="Token变量的意义"></a>Token变量的意义</h2><p>token翻译为象征，符号，代表。在创建窗口的时候，多处定义了和token有关的变量，该变量的一般类型都是一个IBinder对象。IBinder对象的作用就是为了IPC调用（进程间通讯）。</p>
+<table>
+<thead>
+<tr>
+<th>代码路径</th>
+<th style="text-align:center">类名</th>
+<th style="text-align:right">变量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>frameworks/base/core/java/android/app/Activity.java</td>
+<td style="text-align:center">Activity.Java</td>
+<td style="text-align:right">IBinder mToken</td>
+</tr>
+<tr>
+<td>frameworks/base/core/java/android/view/Window.java</td>
+<td style="text-align:center">Window.java</td>
+<td style="text-align:right">IBinder mAppToken</td>
+</tr>
+<tr>
+<td>frameworks/base/core/java/android/view/WindowManager.java</td>
+<td style="text-align:center">WindowManager.LayoutParams</td>
+<td style="text-align:right">IBinder token</td>
+</tr>
+<tr>
+<td>frameworks/base/core/java/android/view/ViewRootImpl.java</td>
+<td style="text-align:center">ViewRootImpl</td>
+<td style="text-align:right">View.AttachInfo mAttacheInfo</td>
+</tr>
+<tr>
+<td>frameworks/base/core/java/android/view/View.java</td>
+<td style="text-align:center">View</td>
+<td style="text-align:right">View.AttachInfo mAttacheInfo</td>
+</tr>
+<tr>
+<td>frameworks/base/core/java/android/view/View.java</td>
+<td style="text-align:center">View.AttachInfo</td>
+<td style="text-align:right">IBinder mWindowToken;IBinder mPanelParentWindowToken;IWindow mWindow;</td>
+</tr>
+</tbody>
+</table>
+<h4 id="1-Activity中的mToken"><a href="#1-Activity中的mToken" class="headerlink" title="1.Activity中的mToken"></a>1.Activity中的mToken</h4><p>AmS内部为每一个运行的的Activity都创建了一个HistoryRecord对象，该对象的基本类型是Binder，因此mToken变量的意义正是指向了该HistoryRecord类。该变量的值是在Activity.init()函数中完成的。</p>
+<h4 id="2-Window中的mAppToken"><a href="#2-Window中的mAppToken" class="headerlink" title="2.Window中的mAppToken"></a>2.Window中的mAppToken</h4><p>每一个Window对象中都有一个mAppToken变量，这里的Window对象不是窗口。窗口的本质是View，而Window类是一个应用窗口的抽象。<strong>比如，Window侧重于一个窗口的交互，而窗口（View）侧重于窗口的显示。</strong>若Window类不属于某个Activity，mAppToken的变量为空，否则mAppToken的值与Activity中的mToken的值是相同的。</p>
+<h4 id="3-WindowManager-LayoutParams中的token"><a href="#3-WindowManager-LayoutParams中的token" class="headerlink" title="3.WindowManager.LayoutParams中的token"></a>3.WindowManager.LayoutParams中的token</h4><p>WindowManager.LayoutParams类是指在添加窗口时指定该窗口的布局参数，token的意义正是指定该窗口所对应的Binder对象。因为WmS需要该Binder对象，以便对客户端进行IPC调用。具体说，该token变量的值有三种：</p>
+<ul>
+<li>如果创建的窗口为应用窗口，token的值与Window中的mAppToken值相同。</li>
+<li>如果创建的窗口为子窗口，token为其父窗口的W对象。</li>
+<li>如果创建的窗口为系统窗口，token为空。</li>
+</ul>
+<h4 id="4-View中的token"><a href="#4-View中的token" class="headerlink" title="4.View中的token"></a>4.View中的token</h4><p>首先看ViewRoot，客户端的每一个窗口都对应一个ViewRoot对象，在其对象内部的mAttachInfo是该对象被构造时同时创建出来的。该变量的类型与View中的mAttachInfo相同。<br>View类中的mAttachInfo，其含义是当该View对象被真正作为某个窗口W类的内部View时，该变量就会被赋值为mAttachInfo。同一个窗口包含的所有View对象，其内部的mAttachInfo内容都是相同的。</p>
+<p>mAttachInfo包含了三个Binder变量：</p>
+<ul>
+<li>mWindowToken，指窗口对应的W对象。</li>
+<li>mPanelParentWindowToken，如果该窗口为子窗口，那么该变量为父窗口中的W对象。该变量赋值与mWindowToken是互斥的，因为如果mWindowToken不为空，则意味着没有父窗口。</li>
+<li>mWindow，既是一个Binder对象，也是一个IWindow对象。</li>
+</ul>
+<p>以上所有token的关系如下：</p>
+<p><img src="http://img.blog.csdn.net/20160305161344421?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="token"></p>
+<h2 id="创建应用窗口"><a href="#创建应用窗口" class="headerlink" title="创建应用窗口"></a>创建应用窗口</h2><ol>
+<li>每一个应用窗口都对应一个Activity，所以要创建一个应用窗口必须先创建一个Activity对象。当AmS决定启动某一个Activity时，会先通知客户端进程，每一个客户端进程对应一个ActivityThread类，所以启动Activity任务由ActivityThread完成。<strong>启动某一个Activity代码本质是构造一个Activity对象。</strong>代码如下，</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Activity activity = null;</span><br><span class="line">      try &#123;</span><br><span class="line">          java.lang.ClassLoader cl = r.packageInfo.getClassLoader();//使用ClassLoader从程序文件中装载指定的Activity对应的Class文件</span><br><span class="line">          activity = mInstrumentation.newActivity(</span><br><span class="line">                  cl, component.getClassName(), r.intent);</span><br><span class="line">          r.intent.setExtrasClassLoader(cl);</span><br><span class="line">          if (r.state != null) &#123;</span><br><span class="line">              r.state.setClassLoader(cl);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125; catch (Exception e) &#123;</span><br><span class="line">          if (!mInstrumentation.onException(activity, e)) &#123;</span><br><span class="line">              throw new RuntimeException(</span><br><span class="line">                  &quot;Unable to instantiate activity &quot; + component</span><br><span class="line">                  + &quot;: &quot; + e.toString(), e);</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+<p>以上代码运用Java反射机制，把我们配置好的activity对象实例化出来，然后如果成功if(activity != null),就调用activity.attch(xxxx)方法,代码如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">if (activity != null) &#123;</span><br><span class="line">			...</span><br><span class="line">			activity.attach(appContext, this, getInstrumentation(), r.token,</span><br><span class="line">                        r.ident, app, r.intent, r.activityInfo, title, r.parent,</span><br><span class="line">                        r.embeddedID, r.lastNonConfigurationInstance,</span><br><span class="line">                        r.lastNonConfigurationChildInstances, config);</span><br><span class="line">			...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li>attach()的作用是为刚构造好的Activity设置内部变量，包括一下几项：</li>
+</ol>
+<ul>
+<li>appContext：该对象将作为Activity的BaseContext。因为Context是abstract的，所以该类中需要一个真正的Context对象，而appContext就是。appContext由new ContextImpl()方法创建。</li>
+<li>this：指ActivityThread对象，Activity对象内部可能需要主程序的引用。</li>
+<li>r.token：r是一个ActivityThread对象，其内部变量token的含义是AmS中的一个HistoryRecord对象。</li>
+<li>r.parent：一个Activity可以有一个父Activity类，<strong>这种概念是为了把Activity嵌套到另一个Activity内部执行</strong>。在应用程序使用时，<strong>常用ActivityGroup类</strong>，ActivityGroup功能的内部变量正是它。</li>
+</ul>
+<ol>
+<li>在attach()方法内部除了为变量赋值外，另一件重要的事情就是为该Activity创建Window对象，通过调用PolicyManager的静态方法makeNewWindow()完成。创建好Window对象后，将其赋值给Activity的内部变量mWindow，并设置该Window的Callback接口为当前的Activity对象。<strong>这就是为什么用户消息能够传递到Activity中的原因。</strong></li>
+</ol>
+<p>代码如下，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">final void attach(Context context, ActivityThread aThread,</span><br><span class="line">          Instrumentation instr, IBinder token, int ident,</span><br><span class="line">          Application application, Intent intent, ActivityInfo info,</span><br><span class="line">          CharSequence title, Activity parent, String id,</span><br><span class="line">          Object lastNonConfigurationInstance,</span><br><span class="line">          HashMap&lt;String,Object&gt; lastNonConfigurationChildInstances,</span><br><span class="line">          Configuration config) &#123;</span><br><span class="line">      attachBaseContext(context);</span><br><span class="line"></span><br><span class="line">      mWindow = PolicyManager.makeNewWindow(this);</span><br><span class="line">      mWindow.setCallback(this);//设置该Window的Callback接口为当前的Activity对象</span><br></pre></td></tr></table></figure>
+<ol>
+<li>创建好Window对象后，需要给Window对象中的mWindowManager变量赋值，WindowManager是一个接口类，真正实现该接口的有两个类，一个是Window.LocalWindowManager，另一个是WindowManagerImpl类。LocalWindowManager是一个类似ContextWrapper的包装类，真正实现这些功能的是WindowManagerImpl类。它们之间类的关系如下，</li>
+</ol>
+<p><img src="http://img.blog.csdn.net/20160305195550140?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="WindowManagerImpl"></p>
+<p>给mWindowManager赋值的代码如下，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mWindow.setWindowManager(null, mToken, mComponent.flattenToString());//在Window类该方法实现中，如果第一个参数为null，内部自动创建一个默认的WindowManagerImpl对象</span><br><span class="line">      if (mParent != null) &#123;</span><br><span class="line">          mWindow.setContainer(mParent.getWindow());</span><br><span class="line">      &#125;</span><br><span class="line">      mWindowManager = mWindow.getWindowManager();&lt;/span&gt;</span><br></pre></td></tr></table></figure>
+<p>每一个Activity内部也有一个mWindowManager对象，其值和Window类中的同名变量相同。</p>
+<ol>
+<li>配置好了的Activity和Window对象，之后需要给该窗口中添加真正的显示元素View或者ViewGroup。在Activity中添加界面是在onCreate()方法中调用setContentView()方法，代码如下</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public void setContentView(int layoutResID) &#123;</span><br><span class="line">       getWindow().setContentView(layoutResID);//又调用到了Window对象的&lt;span style=&quot;font-family: &apos;Microsoft YaHei&apos;;&quot;&gt;setContentView方法&lt;/span&gt;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>6.因此，分析Window类中如何把一个layout.xml文件作为Window界面。PhoneWindow的setContentView()方法如下，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public void setContentView(int layoutResID) &#123;</span><br><span class="line">       if (mContentParent == null) &#123;//若为空，调用installDecor为Window类安装一个窗口修饰，就是界面上的标题栏，</span><br><span class="line">			     //指定的layout.xml被包含在窗口修饰中，称为窗口内容</span><br><span class="line">           installDecor();</span><br><span class="line">       &#125; else &#123;</span><br><span class="line">           mContentParent.removeAllViews();</span><br><span class="line">       &#125;</span><br><span class="line">       mLayoutInflater.inflate(layoutResID, mContentParent);</span><br><span class="line">       final Callback cb = getCallback();</span><br><span class="line">       if (cb != null) &#123;</span><br><span class="line">           cb.onContentChanged();</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>窗口的修饰也是一个ViewGroup，窗口修饰及其内部的窗口内容加起来就是我们所说的窗口，或者称为Window的界面。关系图如下所示，</p>
+<p><img src="http://img.blog.csdn.net/20160305210849433?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="窗口修饰"></p>
+<p>FrameWork中定义了多种窗口修饰，installDecor()代码如下，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">private void installDecor() &#123;</span><br><span class="line">       if (mDecor == null) &#123;</span><br><span class="line">           mDecor = generateDecor();</span><br><span class="line">           mDecor.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);//将窗口修饰做为mDecor的子窗口</span><br><span class="line">           mDecor.setIsRootNamespace(true);</span><br><span class="line">       &#125;</span><br><span class="line">       if (mContentParent == null) &#123;</span><br><span class="line">           mContentParent = generateLayout(mDecor);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用generateDecor()创建一个DecorView对象，赋值给mDecor变量。</li>
+<li>根据用户指定的参数选择不同的窗口装饰，并将窗口修饰做为mDecor的子窗口。</li>
+<li>给mContentParent赋值，其值是通过调用 ViewGroup contentParent = （ViewGroup）findViewById（ID_ANDROID_CONTENT）获得，ID_ANDROID_CONTENT正是id = content 的FrameLayout。</li>
+</ul>
+<p>通过在setContentView()中调用inflate()方法，可以把用户界面layout.xml文件添加到窗口修饰中，inflate()方法的第二个参数正是mContentParent，即id = content 的FrameLayout。</p>
+<p>最后，回调cb.onContentChanged()方法，通知应用程序窗口内容发生了改变。cb为Activity本身，因为Activity实现了Window.Callback的接口，并且在attach()方法中将自身作为Window对象的Callback接口实现。</p>
+<p>以上“根据用户指定的参数”中“用户指定”有两个地方可以指定，</p>
+<p><img src="http://img.blog.csdn.net/20160306175320645?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="根据用户指定的参数"></p>
+<ol>
+<li>Window类设置完成其视图元素后，需要将创建的这个窗口告诉WmS，通过WmS将窗口显示在屏幕上。Activity准备好后会通知AmS，Ams通过各种条件判断最终调用Activity中的makeVisible()方法，该方法以及后续的调用将真正完成将窗口加进WmS之中。代码如下，</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">void makeVisible() &#123;</span><br><span class="line">       if (!mWindowAdded) &#123;		//若没有添加窗口（mWindowAdded == false），则执行一下代码</span><br><span class="line">           ViewManager wm = getWindowManager();			//获取Activity内部的WM对象，实际上是Window.LocalWindowManager对象</span><br><span class="line">           wm.addView(mDecor, getWindow().getAttributes());		//此addView()方法，不是WindowManageImpl类中的addView()方法</span><br><span class="line">           mWindowAdded = true;						//添加窗口为真</span><br><span class="line">       &#125;</span><br><span class="line">       mDecor.setVisibility(View.VISIBLE);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>addView()中第一个参数mDecor是一个DecorView对象，也就是用户所能看到的Activity对应的全部界面内容。第二个参数是在构造Window对象时默认构造的WindowManager.LayoutParams对象，该代码在Window类的初始化代码中，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">private final WindowManager.LayoutParams mWindowAttributes =</span><br><span class="line">       new WindowManager.LayoutParams();</span><br></pre></td></tr></table></figure></p>
+<p>WindowManager.LayoutParams()的构造函数如下，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public LayoutParams() &#123;</span><br><span class="line">           super(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);</span><br><span class="line">           type = TYPE_APPLICATION;</span><br><span class="line">           format = PixelFormat.OPAQUE;</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure></p>
+<p>以上构造函数说明，在默认情况下的窗口参数的类型是TYPE_APPLICATION，即应用程序类型的窗口。</p>
+<p>Activity添加窗口时为何不直接使用WindowManagerImpl类，而是使用LocalWindowManager类？因为后者会检查WindowManager.LayoutParams的值，并给token赋值，而直接使用WindowManagerImpl则不会检查Params的值，所以可以将LocalWindowManager看成一道关卡。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">if (wp.type &gt;= WindowManager.LayoutParams.FIRST_SUB_WINDOW &amp;&amp;</span><br><span class="line">                wp.type &lt;= WindowManager.LayoutParams.LAST_SUB_WINDOW) &#123;	//如果应用窗口的类型大于等于第一个应用窗口且小于等于最后一个应用窗口，执行以下代码。</span><br><span class="line">                if (wp.token == null) &#123;			//如果token为空，则把Activity对应的窗口token赋值给params的token</span><br><span class="line">                    View decor = peekDecorView();</span><br><span class="line">                    if (decor != null) &#123;</span><br><span class="line">                        wp.token = decor.getWindowToken();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br></pre></td></tr></table></figure></p>
+<p>9.过了LocalWindowManager检查之后，需要调用的addView()方法。一个应用程序内部无论有多少个Activity，但只有一个WindowManagerImpl对象。WindowManagerImpl类中维护三个数组，用于保存该应用程序中所拥有的窗口状态，</p>
+<ul>
+<li>View[] mViews：这里的每一个View对象都将成为WmS所认为的一个窗口。</li>
+<li>ViewRoot[] mRoots：所有的ViewRoot对象，mViews中每一个View对象都对应一个ViewRoot对象。</li>
+<li>WindowManager.LayoutParams[] mParams：当把mViews中的View对象当做一个窗口添加进一个WmS中，WmS要求每个被添加的窗口都要对应一个LayoutParams对象，用mParams来保存。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">private void addView(View view, ViewGroup.LayoutParams params, boolean nest)</span><br><span class="line">   &#123;</span><br><span class="line">       if (Config.LOGV) Log.v(&quot;WindowManager&quot;, &quot;addView view=&quot; + view);</span><br><span class="line"></span><br><span class="line">       if (!(params instanceof WindowManager.LayoutParams)) &#123;</span><br><span class="line">           throw new IllegalArgumentException(</span><br><span class="line">                   &quot;Params must be WindowManager.LayoutParams&quot;);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       final WindowManager.LayoutParams wparams</span><br><span class="line">               = (WindowManager.LayoutParams)params;</span><br><span class="line">       </span><br><span class="line">       ViewRoot root;</span><br><span class="line">       View panelParentView = null;</span><br><span class="line">       </span><br><span class="line">       synchronized (this) &#123;</span><br><span class="line">           // Here&apos;s an odd/questionable case: if someone tries to add a</span><br><span class="line">           // view multiple times, then we simply bump up a nesting count</span><br><span class="line">           // and they need to remove the view the corresponding number of</span><br><span class="line">           // times to have it actually removed from the window manager.</span><br><span class="line">           // This is useful specifically for the notification manager,</span><br><span class="line">           // which can continually add/remove the same view as a</span><br><span class="line">           // notification gets updated.</span><br><span class="line">           int index = findViewLocked(view, false);</span><br><span class="line">           if (index &gt;= 0) &#123;</span><br><span class="line">               if (!nest) &#123;								//nest为false抛出异常，检查所添加的窗口是否已经添加过了，不允许重复添加</span><br><span class="line">                   throw new IllegalStateException(&quot;View &quot; + view</span><br><span class="line">                           + &quot; has already been added to the window manager.&quot;);</span><br><span class="line">               &#125;</span><br><span class="line">               root = mRoots[index];</span><br><span class="line">               root.mAddNesting++;</span><br><span class="line">               // Update layout parameters.</span><br><span class="line">               view.setLayoutParams(wparams);</span><br><span class="line">               root.setLayoutParams(wparams, true);</span><br><span class="line">               return;</span><br><span class="line">           &#125;</span><br><span class="line">           </span><br><span class="line">           // If this is a panel window, then find the window it is being</span><br><span class="line">           // attached to for future reference.</span><br><span class="line">           if (wparams.type &gt;= WindowManager.LayoutParams.FIRST_SUB_WINDOW &amp;&amp;</span><br><span class="line">                   wparams.type &lt;= WindowManager.LayoutParams.LAST_SUB_WINDOW) &#123;</span><br><span class="line">               final int count = mViews != null ? mViews.length : 0;</span><br><span class="line">               for (int i=0; i&lt;count; i++) &#123;</span><br><span class="line">                   if (mRoots[i].mWindow.asBinder() == wparams.token) &#123;</span><br><span class="line">           //若所添加的窗口为子窗口类型，找到其父窗口，并保存在panelParentView，该变量将做为后面调用ViewRoot的setView()参数                   &#125;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">           </span><br><span class="line">           root = new ViewRoot(view.getContext());//创建一个新的ViewRoot</span><br><span class="line">           root.mAddNesting = 1;</span><br><span class="line"></span><br><span class="line">           view.setLayoutParams(wparams);</span><br><span class="line">           </span><br><span class="line">           if (mViews == null) &#123;</span><br><span class="line">               index = 1;</span><br><span class="line">               mViews = new View[1];</span><br><span class="line">               mRoots = new ViewRoot[1];</span><br><span class="line">               mParams = new WindowManager.LayoutParams[1];</span><br><span class="line">           &#125; else &#123;</span><br><span class="line">               index = mViews.length + 1;</span><br><span class="line">               Object[] old = mViews;</span><br><span class="line">               mViews = new View[index];</span><br><span class="line">               System.arraycopy(old, 0, mViews, 0, index-1);							//使用System.arraycopy()实现数组之间的复制old = mRoots;</span><br><span class="line">               mRoots = new ViewRoot[index];</span><br><span class="line">               System.arraycopy(old, 0, mRoots, 0, index-1);</span><br><span class="line">               old = mParams;</span><br><span class="line">               mParams = new WindowManager.LayoutParams[index];</span><br><span class="line">               System.arraycopy(old, 0, mParams, 0, index-1);</span><br><span class="line">           &#125;</span><br><span class="line">           index--;</span><br><span class="line"></span><br><span class="line">           mViews[index] = view;		//把新建的View，ViewRoot，WindowManager.LayoutParams对象保存到数组的最后</span><br><span class="line">           mRoots[index] = root;</span><br><span class="line">           mParams[index] = wparams;</span><br><span class="line">       &#125;</span><br><span class="line">       // do this last because it fires off messages to start doing things</span><br><span class="line">       root.setView(view, wparams, panelParentView);		//调用ViewRoot的setView()方法完成窗口的添加工作</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>调用ViewRoot的setView(View view, WindowManager.LayoutParams attrs, View panelParentView)方法完成<strong>最后的窗口添加工作</strong>，三个参数的主要意义如下，</li>
+</ol>
+<ul>
+<li>view：是WindowManagerImpl中mViews的一个元素，即新建的窗口界面；</li>
+<li>attrs：添加窗口的参数，该参数描述该窗口的风格，大小，位置等等。尤其是内部变量token，指明该窗口和相关Activity的关系。</li>
+<li>panelParentView：该对象也WindowManagerImpl中mViews的一个元素。仅当该窗口有父窗口时，其值才有意义。</li>
+</ul>
+<p>setView的执行流程如下，</p>
+<p>（1）给ViewRoot变量赋值。包括mViews，mWindowAttributes，mAttachInfo，代码如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mView = view;</span><br><span class="line">      mWindowAttributes.copyFrom(attrs);</span><br><span class="line">mSoftInputMode = attrs.softInputMode;</span><br><span class="line">      mWindowAttributesChanged = true;</span><br><span class="line">      mAttachInfo.mRootView = view;			//mAttachInfo变量其成员mRootView赋值参数为View</span><br><span class="line">if (panelParentView != null) &#123;			//若添加的是子窗口</span><br><span class="line">	mAttachInfo.mPanelParentWindowToken	= panelParentView.getApplicationWindowToken();   //同时给mPanelParentWindowToken赋值，其值为父窗口的token</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure></p>
+<p>（2）调用requestLayout()，发出界面重绘请求。发出一个异步的消息，便于UI线程下一个处理的消息是界面重绘，从而<strong>让该窗口在响应任何其他用户消息之前首先变得可见。</strong></p>
+<p>（3）调用sWindowSession.add()，通知WmS添加窗口，代码如下，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">try &#123;</span><br><span class="line">                 res = sWindowSession.add(mWindow, mWindowAttributes,</span><br><span class="line">                         getHostVisibility(), mAttachInfo.mContentInsets,</span><br><span class="line">                         mInputChannel);</span><br><span class="line">         &#125; catch (RemoteException e) &#123;</span><br></pre></td></tr></table></figure></p>
+<pre><code>ssWindowSession在ViewRoot中是一个静态的变量，
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">static IWindowSession sWindowSession;//不加任何权限修饰符即为包内访问</span><br></pre></td></tr></table></figure>
+<p>每一个应用程序仅有一个sWindowSession对象，该对象类型为IWindowSession，即为一个Binder引用，该引用对应着WmS中的Session子类，WmS为每一个应用程序分配一个Session（会话）对象。<br>因为<strong>sWindowSession变量的访问权限为包内访问</strong>，所以不能不经过Activity，或者WindowManager，或者不创建Window对象来创建窗口。<br>sWindowSession变量是在ViewRoot中，构造函数调用getWindowSession()方法返回的。该方法内部会自动判断sWindowSession是否为空，为空则创建一个。这也是所谓的<strong>工厂模式创建对象。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public static IWindowSession getWindowSession(Looper mainLooper) &#123;</span><br><span class="line">        synchronized (mStaticInit) &#123;</span><br><span class="line">            if (!mInitialized) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    InputMethodManager imm = InputMethodManager.getInstance(mainLooper);</span><br><span class="line">                    sWindowSession = IWindowManager.Stub.asInterface(//sWindowSession是通过IWindowManager而来的，IWindowManager在源码中是@hide的，意味着SDK中将不包含该类</span><br><span class="line">                            ServiceManager.getService(&quot;window&quot;))</span><br><span class="line">							.openSession(imm.getClient(), imm.getInputContext());</span><br><span class="line">                    mInitialized = true;</span><br><span class="line">                &#125; catch (RemoteException e) &#123;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            return sWindowSession;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以在标准的程序设计中，只能通过WindowManager类来创建窗口。若有特殊需要，可通过改变Framework，以达到灵活配置。</p>
+<h2 id="创建子窗口"><a href="#创建子窗口" class="headerlink" title="创建子窗口"></a>创建子窗口</h2><p>下面介绍几个具体的子窗口，</p>
+<h4 id="一、Dialog的创建"><a href="#一、Dialog的创建" class="headerlink" title="一、Dialog的创建"></a>一、Dialog的创建</h4><p>public Dialog(Context context, int theme) {        //创建Dialog内部的Context对象，并赋值给mContext<br>        mContext = new ContextThemeWrapper(<br>            context, theme == 0 ? com.android.internal.R.style.Theme_Dialog : theme);        //真正实现Context的是ContextImpl，所以mContext也是一个壳（包装）。没有指定主题就使用默认值<br>        mWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);<br>        Window w = PolicyManager.makeNewWindow(mContext);        //调用makeNewWindow()创建一个Window对象，与Activity中创建Window对象方法相同<br>        mWindow = w;<br>        w.setCallback(this);        //setCallback()设置该Window的消息回调接口为本Dialog对象。（类似于Activity的消息处理方式）<br>        w.setWindowManager(mWindowManager, null, null);<br>        w.setGravity(Gravity.CENTER);<br>        mUiThread = Thread.currentThread();<br>        mListenersHandler = new ListenersHandler(this);        //创建一个回调句柄mListenerHandler（Handler为句柄），在内部发送异步消息。<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">在调用show()方法前，Dialog内部仅仅创建了一个Window对象，**没有告知WmS添加一个可以显示的窗口**。所以show()方法中必须告知WmS添加一个真正可以显示的窗口。在show()方法内部主要完成以下几件事情，</span><br><span class="line"></span><br><span class="line">第一，如果窗口存在，则直接显示窗口，并返回，代码如下</span><br></pre></td></tr></table></figure></p>
+<pre><code>if (mShowing) {
+        if (mDecor != null) {
+            mDecor.setVisibility(View.VISIBLE);
+        }
+        return;
+}
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">第二，如果窗口还不存在，给应用程序一个设置窗口的机会，回调Dialog的onCreate()方法</span><br></pre></td></tr></table></figure>
+<pre><code>if (!mCreated) {
+        dispatchOnCreate(null);
+}
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">第三，为该Dialog中的mDecor变量赋值，并设置添加Dialog窗口所使用的LayoutParams参数</span><br></pre></td></tr></table></figure>
+<pre><code>mDecor = mWindow.getDecorView();
+WindowManager.LayoutParams l = mWindow.getAttributes();
+if ((l.softInputMode
+        &amp; WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION) == 0) {
+    WindowManager.LayoutParams nl = new WindowManager.LayoutParams();
+    nl.copyFrom(l);
+    nl.softInputMode |=
+            WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION;
+    l = nl;
+}
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">第四，调用WindowManager的addView()方法，添加窗口。</span><br></pre></td></tr></table></figure>
+<pre><code>try {
+        mWindowManager.addView(mDecor, l);
+        mShowing = true;
+</code></pre><p>第五，可以调用Dialog的setonShowListener()为Dialog添加一个回调接口。执行该回调函数是异步的。下面来区别异步和同步，</p>
+<ul>
+<li>若回调目的是<strong>为本次循环设置某些参数</strong>，必须采用同步回调。</li>
+<li>若回调函数中指定的<strong>代码依赖本次循环后续代码的执行结果</strong>，必须采用异步回调。否则，回调代码会因某种条件不具备而无法正常执行。</li>
+<li>若回调代码的<strong>执行时间比较长</strong>，尽量采用异步回调。系统为每一个循环的执行时间设置的<strong>阈值是5秒</strong>。5秒内还没有执行下一个循环，系统会弹出应用程序无响应（ANR，Application Not Responding）的对话框。</li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20160307191157376?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="异步回调"><br><img src="http://img.blog.csdn.net/20160307191209355?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="同步回调"></p>
+<h4 id="二、PopupWindow（弹出窗口）的创建"><a href="#二、PopupWindow（弹出窗口）的创建" class="headerlink" title="二、PopupWindow（弹出窗口）的创建"></a>二、PopupWindow（弹出窗口）的创建</h4><p>弹出窗口是Framework提供的一种UI控件，例如下拉列表就是一种PopupWindow。AutoText控件（自动提示、补全输入）也是基于PopupWindow实现。<br>PopupWindow不继承与Window类，所以该类不属于窗口类。该类必须完成以下几件事情，</p>
+<p>第一，为该类中的mContext变量赋值，该值可直接来源于构造函数的参数，也可以根据参数中的View对象获得，代码如下，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public PopupWindow(View contentView, int width, int height, boolean focusable) &#123;</span><br><span class="line">        if (contentView != null) &#123;</span><br><span class="line">            mContext = contentView.getContext();</span><br></pre></td></tr></table></figure></p>
+<p>第二，为该类中的mWindowManager变量赋值。该变量的值实际上是创建该PopupWindow对象的Activity中的mWindowManager对象。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);</span><br></pre></td></tr></table></figure></p>
+<p>第三，PopupWindow提供以下API将mContentView对应的窗口显示到界面上的任何位置。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public void showAtLocation(View parent, int gravity, int x, int y) &#123;&#125;</span><br><span class="line">public void showAsDropDown(View anchor, int xoff, int yoff) &#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中，parent与anchor本质没有区别，它们俩唯一的区别是指定窗口的位置方式不同。两个方法的内部调用流程相同，如下，</p>
+<p><img src="http://img.blog.csdn.net/20160307200924174" alt="内部调用流程"></p>
+<p>首先看，LayoutParams对象。通过调用createPopupLayout()方法。该方法参数是一个IBinder对象，其值应该为父窗口的token值，通过调用parent.getWindowToken()获得。创建LayoutParams的内部变量值如下，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">WindowManager.LayoutParams p = new WindowManager.LayoutParams();</span><br><span class="line">      // these gravity settings put the view at the top left corner of the</span><br><span class="line">      // screen. The view is then positioned to the appropriate location</span><br><span class="line">      // by setting the x and y offsets to match the anchor&apos;s bottom</span><br><span class="line">      // left corner</span><br><span class="line">      p.gravity = Gravity.LEFT | Gravity.TOP;</span><br><span class="line">      p.width = mLastWidth = mWidth;</span><br><span class="line">      p.height = mLastHeight = mHeight;</span><br><span class="line">      if (mBackground != null) &#123;</span><br><span class="line">          p.format = mBackground.getOpacity();</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">          p.format = PixelFormat.TRANSLUCENT;</span><br><span class="line">      &#125;</span><br><span class="line">      p.flags = computeFlags(p.flags);</span><br><span class="line">      p.type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL;&lt;/span&gt;</span><br><span class="line">p.token = token;</span><br></pre></td></tr></table></figure></p>
+<p>注意该LayoutParams对象的type类型，“即应用程序的子窗口，PopupWindow的默认类型”。<strong>添加子窗口时，要LocalWindowManager要检查其token值必须为父窗口的token</strong>。所以给p.token赋上父窗口的token值。</p>
+<p>在PopupWindow中，<strong>提供了setContentView()方法用于设置窗口内容，setBackgroundDrawable()用于设置窗口背景</strong>。所以在准备窗口内容的preparePopup()方法中，会判断是否有窗口背景，若没有，窗口内容就是mContentView，否则创建一个PopupViewContainer，这个类继承于FrameLayout，最后将mContentView添加到该FrameLayout中，具体代码如下，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">if (mBackground != null) &#123;			//窗口背景存在</span><br><span class="line">            final ViewGroup.LayoutParams layoutParams = mContentView.getLayoutParams();</span><br><span class="line">            int height = ViewGroup.LayoutParams.MATCH_PARENT;</span><br><span class="line">            if (layoutParams != null &amp;&amp;</span><br><span class="line">                    layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT) &#123;</span><br><span class="line">                height = ViewGroup.LayoutParams.WRAP_CONTENT;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            // when a background is available, we embed the content view</span><br><span class="line">            // within another view that owns the background drawable</span><br><span class="line">            PopupViewContainer popupViewContainer = new PopupViewContainer(mContext);</span><br><span class="line">            PopupViewContainer.LayoutParams listParams = new PopupViewContainer.LayoutParams(</span><br><span class="line">                    ViewGroup.LayoutParams.MATCH_PARENT, height</span><br><span class="line">            );</span><br><span class="line">            popupViewContainer.setBackgroundDrawable(mBackground);</span><br><span class="line">            popupViewContainer.addView(mContentView, listParams);</span><br><span class="line"></span><br><span class="line">            mPopupView = popupViewContainer;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            mPopupView = mContentView;				//若没有窗口背景</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="三、ContextMenu（情景菜单）的创建"><a href="#三、ContextMenu（情景菜单）的创建" class="headerlink" title="三、ContextMenu（情景菜单）的创建"></a>三、ContextMenu（情景菜单）的创建</h4><p>情景菜单一般是指长按ListView的某个Item时弹出的菜单。不过，程序可以给任何一个View设置情景菜单，触发的方式不一定是长按，也可能是双击，单击等等。<br>情景菜单实际上是一个Dialog，但情景菜单把创建好的Dialog添加到WmS时，会修改该Dialog窗口的类型，即从默认的应用类型修改为子窗口类型。</p>
+<ol>
+<li>触发情景菜单的消息</li>
+</ol>
+<p>显示情景菜单有两种方式：第一、当用户长按某个View时，若该View已经添加过场景菜单，则会弹出一个场景菜单窗口；第二，调用openContextMenu()方法。关系如下，</p>
+<p><img src="http://img.blog.csdn.net/20160308173230316" alt="触发情景菜单的消息"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">boolean handled = false;</span><br><span class="line">if (mOnLongClickListener != null) &#123;&lt;span style=&quot;white-space:pre&quot;&gt;				//长按参数不为空时</span><br><span class="line">    handled = mOnLongClickListener.onLongClick(View.this);					//执行长按的回调函数</span><br><span class="line">&#125;</span><br><span class="line">if (!handled) &#123;												//如果用户没有处理</span><br><span class="line">    handled = showContextMenu();							//调用showContextMenu()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>菜单功能中几个类的关系</li>
+</ol>
+<p>在showContextMenu()内部调用其父类方法showContextMenuForChild()。<strong>对于应用类窗口，任何View的根视图都是DecorView对象，</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public boolean showContextMenuForChild(View originalView) &#123;</span><br><span class="line">           // Reuse the context menu builder</span><br><span class="line">           if (mContextMenu == null) &#123;</span><br><span class="line">               mContextMenu = new ContextMenuBuilder(getContext());</span><br><span class="line">               mContextMenu.setCallback(mContextMenuCallback);</span><br><span class="line">           &#125; else &#123;</span><br><span class="line">               mContextMenu.clearAll();</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           mContextMenuHelper = mContextMenu.show(originalView, originalView.getWindowToken());</span><br><span class="line">           return mContextMenuHelper != null;</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Detolv Wang</h4>
+    <p>专注，严肃，活泼，有趣</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://detolv.com/2016/05/23/Android窗口机制/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://detolv.com/2016/05/23/Android窗口机制/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://detolv.com/2016/05/23/Android窗口机制/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2016/05/23/浅析Context/">
+        浅析Context →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">在路上</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

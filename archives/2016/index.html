@@ -28,7 +28,7 @@
   <header class="site-head"  style="background-image: url(//blog.ghost.org/content/images/2013/Nov/cover.png)" >
     <div class="vertical">
         <div class="site-head-content inner">
-             <a class="blog-logo" href="/"><img src="//o7mctx3v4.bkt.clouddn.com/783c9c8b1fefabfaab0ed5306a70f355.jpg?attname=&e=1464006049&token=V8ZXziR7NrEO2PZDCUcbsSeLVeTUIiTSdGXXRydw:qP7NOhAgHIEAxvpd_VuUWV48ZWg" alt="Blog Logo"/></a> 
+             <a class="blog-logo" href="/"><img src="//o7mctx3v4.bkt.clouddn.com/round_corner_image_by_atool.png?attname=&e=1464009405&token=V8ZXziR7NrEO2PZDCUcbsSeLVeTUIiTSdGXXRydw:-Q7oiG6F53IR5D8Nrj45SdBEKys" alt="Blog Logo"/></a> 
             <h1 class="blog-title">在路上</h1>
             <h2 class="blog-description">除了情怀，还有诗和远方</h2>
         </div>
@@ -36,6 +36,216 @@
 </header>
   
 <main class="content" role="main">
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2016-05-23T13:16:55.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+    
+    | 
+    <a href='/tags/Android/'>Android</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2016/05/23/Android窗口机制/">Android窗口机制</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        总览在Android中，窗口的管理系统是基于C/S模式的。其中，客户端负责请求创建窗口、使用窗口，而服务端则完成窗口的维护、显示。
+如图所示，在Client端，并不是直接与Wms交互，而是通过本地对象WindowManager，然后由WindowManager完成和WmS的交互。对于Android应用来说，这个交互是透明的，即应用不能感知到WmS的存在。
+窗口的类型FrameWork定义了三种窗口的类型，定义在WindowManager
+      
+      </p>
+      
+      <p>
+          <a href="/2016/05/23/Android窗口机制/" class="excerpt-link">阅读更多...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2016-05-23T13:10:10.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+    
+    | 
+    <a href='/tags/Android/'>Android</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2016/05/23/浅析Context/">浅析Context</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        Context是什么？Context在android中一般被翻译为“上下文”，但是从语义上来看context更应该被理解为“场景”。
+一个Context意味着一个场景，一个场景就是用户和操作系统交互的过程。比如，当你打电话的时候，场景包括电话交互界面以及它隐藏在背后的数据。
+从代码中可以看出Activity类是基于Context，Service类也是基于Context的。从设计的角度看Activity除了基于Context外，还实现了其
+      
+      </p>
+      
+      <p>
+          <a href="/2016/05/23/浅析Context/" class="excerpt-link">阅读更多...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2016-05-23T13:08:34.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+    
+    | 
+    <a href='/tags/Android/'>Android</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2016/05/23/Android系统架构/">Android系统架构</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        Android系统架构
+上图为Android系统架构，可以看出Android系统大体分为四层，由底层向高层依次是：
+
+Linux内核层：包含Linux内核与驱动（e.g.USB驱动，蓝牙驱动，WIFI驱动）。
+Libraries层：提供动态库（共享库），Android运行时库，Dalvik虚拟机。这一层大部分使用C，C++编写，可以简单认为是Native层。
+Framework层：这一层使用Java编写，可以认为是Android平台上J
+      
+      </p>
+      
+      <p>
+          <a href="/2016/05/23/Android系统架构/" class="excerpt-link">阅读更多...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2016-05-23T13:00:23.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+    
+    | 
+    <a href='/tags/Android/'>Android</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2016/05/23/Android中JNI的使用/">Android中JNI的使用</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        Android中JNI的使用JNI概述JNI（Java Native Interface），译为Java本地调用。JNI是一种技术，如下：
+
+Java程序中的函数可以调用Native语言写的函数，这里的Native一般是指的C/C++语言。
+与此相对应的，Native程序中的函数也可以调用Java层的函数。
+即就是Java可以调用C/C++，而C/C++也可以调用Java。它们彼此可以通过JNI互相调用。
+
+JNI的用处
+因为承载Jav
+      
+      </p>
+      
+      <p>
+          <a href="/2016/05/23/Android中JNI的使用/" class="excerpt-link">阅读更多...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2016-05-23T12:59:30.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+    
+    | 
+    <a href='/tags/Android/'>Android</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2016/05/23/一个像素转换工具类的实现——dp,px,sp之间的相互转换/">一个像素转换工具类的实现——dp,px,sp之间的相互转换</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        什么是dp,px,sp
+dp ：在Android中dp（也即dip，device independent pixels，设备独立像素），一个基于density的抽象单位，不依赖于像素，推荐使用。当densityDip=160时，1dp=1px。
+
+px：pixels（像素），即就是屏幕的像素点。
+
+sp：同dp相似，但还会根据用户的字体大小偏好来缩放(一般建议使用sp作为文本的单位，其它用dp)
+
+
+dip介绍
+QVGA： densit
+      
+      </p>
+      
+      <p>
+          <a href="/2016/05/23/一个像素转换工具类的实现——dp,px,sp之间的相互转换/" class="excerpt-link">阅读更多...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2016-05-23T12:57:57.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+    
+    | 
+    <a href='/tags/UML-面向对象/'>UML 面向对象</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2016/05/23/面向对象的设计方法与UML/">面向对象的设计方法与UML</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        面前对象设计方法的困难我们在做面向对象的程序设计的时候，往往不知道到底该使用多少种对象，多少种方法，这些对象和方法满不满足实际的需求。然而大多数设计师都是凭经验，经验也有靠不住的时候。所以到底如何设计，我们需要跨过真实世界与对象世界的鸿沟——抽象。
+抽象是面向对象设计的精髓
+跨过这道鸿沟，我们需要：
+
+一种把现实世界映射到对象世界的方法。
+
+一种从对象世界描述现实世界的方法。
+
+一种验证对象世界是否正确反映了现实世界的方法。
+
+
+注：前
+      
+      </p>
+      
+      <p>
+          <a href="/2016/05/23/面向对象的设计方法与UML/" class="excerpt-link">阅读更多...</a>
+      </p>
+      
+    </section>
+  </article>
   
   <article class="post">
     <header class="post-header">

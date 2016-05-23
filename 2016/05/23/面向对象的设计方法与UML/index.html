@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>面向对象的设计方法与UML | 在路上</title>
+  <meta name="description" content="除了情怀，还有诗和远方" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="在路上">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(//blog.ghost.org/content/images/2013/Nov/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="//o7mctx3v4.bkt.clouddn.com/round_corner_image_by_atool.png?attname=&e=1464009405&token=V8ZXziR7NrEO2PZDCUcbsSeLVeTUIiTSdGXXRydw:-Q7oiG6F53IR5D8Nrj45SdBEKys" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">在路上</h1>
+            <h2 class="blog-description">除了情怀，还有诗和远方</h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2016-05-23T12:57:57.000Z" itemprop="datePublished">
+          2016-05-23
+      </time>
+    
+    
+    | 
+    <a href='/tags/UML-面向对象/'>UML 面向对象</a>
+    
+    
+</span>
+    <h1 class="post-title">面向对象的设计方法与UML</h1>
+    <section class="post-content">
+      <h2 id="面前对象设计方法的困难"><a href="#面前对象设计方法的困难" class="headerlink" title="面前对象设计方法的困难"></a>面前对象设计方法的困难</h2><p>我们在做面向对象的程序设计的时候，往往不知道到底该使用多少种对象，多少种方法，这些对象和方法满不满足实际的需求。然而大多数设计师都是凭经验，经验也有靠不住的时候。所以到底如何设计，<strong>我们需要跨过真实世界与对象世界的鸿沟——抽象。</strong></p>
+<p><strong><em>抽象是面向对象设计的精髓</em></strong></p>
+<p>跨过这道鸿沟，我们需要：</p>
+<ul>
+<li><p>一种把现实世界映射到对象世界的方法。</p>
+</li>
+<li><p>一种从对象世界描述现实世界的方法。</p>
+</li>
+<li><p>一种验证对象世界是否正确反映了现实世界的方法。</p>
+</li>
+</ul>
+<p><em>注：前两条方法相互映射，第三条方法是检验前两条方法的方法。</em></p>
+<h2 id="UML简介"><a href="#UML简介" class="headerlink" title="UML简介"></a>UML简介</h2><p>UML（Unified Modeling Language，统一建模语言），所有的语言都是由<strong>语法和基本词汇</strong>构成的，UML也是。其中，</p>
+<ul>
+<li><p>基本词汇：建立模型所需要的，表达某种特定含义的基本元素，这些元素称为元模型。e.g. 用例，类等。</p>
+</li>
+<li><p>语法：定义元模型之间的关系规则，以及如何利用这些元素和规则绘制图形以建立模型，来映射现实世界。e.g. 表示法，视图（View）。</p>
+</li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20160319200035480" alt="面向对象设计的全过程"></p>
+<p>如上图为面向对象设计的全过程，具体的UML设计方法如下，</p>
+<h3 id="1-从现实世界到业务模型"><a href="#1-从现实世界到业务模型" class="headerlink" title="1. 从现实世界到业务模型"></a>1. 从现实世界到业务模型</h3><ul>
+<li><p>UML采用称之为<strong>参与者</strong>的元模型作为<strong>信息来源的提供者（也是第一驱动者）</strong>，参与者映射现实生活中的”人“。要建立的模型的意义完全被参与者决定，所建立的模型完全为参与者服务，<strong>参与者是整个建模过程的中心</strong>。</p>
+</li>
+<li><p>UML采用<strong>用例</strong>这种元模型来表示驱动者的<strong>业务目标</strong>，即参与者想要做什么获得什么。用例映射现实生活中的“事”。</p>
+</li>
+</ul>
+<h3 id="2-从业务模型到概念模型"><a href="#2-从业务模型到概念模型" class="headerlink" title="2. 从业务模型到概念模型"></a>2. 从业务模型到概念模型</h3><p>UML通过概念化的过程来建立适合计算机理解和实现的模型，称之为分析模型。从图中可以看出，<strong>分析模型向上映射了原始需求，向下为计算机的实现规定了一种高层次的抽象</strong>。分析模型起到了承上启下的作用，在软件的分析过程中非常重要。绘制分析模型用到的元模型有：</p>
+<ul>
+<li><p>边界类（boundary）：从广义讲，任何一个事物都分为里面和外面，从外面的事物与里面的事物的交互都需要一个边界。宏观来看，<strong>只要是两个不同簇与簇之间的交互都需要一个边界</strong>。而边界决定了外面能对里面干什么，边界在整个分析设计的结果中起到决定性的作用。</p>
+</li>
+<li><p>实体类（entity）：原始需求中领域模型中的业务实体映射了现实世界中参与者完成业务目标时所涉及的事物，UML采用实体类来表达业务实体。</p>
+</li>
+<li><p>控制类（control）：边界和实体都是静态的，UML采用控制类来表述原始需求中的动态信息，即业务中的步骤和活动。从UML出发，边界类与实体类，边界类与边界类，实体类与实体类之间不能直接互相访问，只能通过控制类来代理访问，这样就把动作和物体分开了。在现实生活中，我们也是将动作和物体分开描述的。</p>
+</li>
+</ul>
+<p><em>关于人，事，物，规则的抽象：</em></p>
+<ol>
+<li><em>人：由参与者转化而来的“用户”；</em></li>
+<li><em>事：边界类决定能做什么不能做什么，它代表了原始世界中的“事”；</em></li>
+<li><em>物：实体类由业务模型中的领域模型转化而来；</em></li>
+<li><em>规则：控制类体现了现实世界的“规则”。</em></li>
+</ol>
+<h3 id="3-从概念模型到设计模型"><a href="#3-从概念模型到设计模型" class="headerlink" title="3. 从概念模型到设计模型"></a>3. 从概念模型到设计模型</h3><p>前面的概念模型给了软件设计的蓝图，而设计模型其实就是建造零部件，组装汽车的过程。</p>
+<h2 id="抽象层次"><a href="#抽象层次" class="headerlink" title="抽象层次"></a>抽象层次</h2><p>抽象有两种方法：</p>
+<p><img src="http://img.blog.csdn.net/20160320160522181" alt="统一过程一般抽象层次"></p>
+<ul>
+<li><p>一种是自顶向下：适用于让人们系统地认识一个事物。e.g. 介绍汽车的工作原理。</p>
+</li>
+<li><p>自底向上：适用于在实践中改进与提高认识。</p>
+</li>
+</ul>
+<h4 id="在软件开发过程中，主体应该采用自顶向下的方法，用少量概念覆盖系统需求，再逐步降低抽象层次直到编写代码。同时，应当辅以自底向上的方法，通过总结在较低抽象层次的实践经验来改进较高层次的概念以提高软件质量。"><a href="#在软件开发过程中，主体应该采用自顶向下的方法，用少量概念覆盖系统需求，再逐步降低抽象层次直到编写代码。同时，应当辅以自底向上的方法，通过总结在较低抽象层次的实践经验来改进较高层次的概念以提高软件质量。" class="headerlink" title="在软件开发过程中，主体应该采用自顶向下的方法，用少量概念覆盖系统需求，再逐步降低抽象层次直到编写代码。同时，应当辅以自底向上的方法，通过总结在较低抽象层次的实践经验来改进较高层次的概念以提高软件质量。"></a><strong><em>在软件开发过程中，主体应该采用自顶向下的方法，用少量概念覆盖系统需求，再逐步降低抽象层次直到编写代码。同时，应当辅以自底向上的方法，通过总结在较低抽象层次的实践经验来改进较高层次的概念以提高软件质量。</em></strong></h4>
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Detolv Wang</h4>
+    <p>专注，严肃，活泼，有趣</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://detolv.com/2016/05/23/面向对象的设计方法与UML/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://detolv.com/2016/05/23/面向对象的设计方法与UML/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://detolv.com/2016/05/23/面向对象的设计方法与UML/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2016/05/23/一个像素转换工具类的实现——dp,px,sp之间的相互转换/">
+        ← 一个像素转换工具类的实现——dp,px,sp之间的相互转换
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2016/05/23/Thinking in Java/">
+        Java编程思想 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">在路上</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>
